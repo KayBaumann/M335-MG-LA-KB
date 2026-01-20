@@ -1,20 +1,133 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content fullscreen class="min-h-screen bg-gradient-to-br from-[#191919] via-[#1a1a1a] to-[#0d0d0d]">
+  <div class="flex min-h-screen flex-col text-white">
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+    <!-- Header -->
+    <div class="flex items-center justify-between p-6">
+      <h1 class="text-2xl font-medium">Schnitzeljagd</h1>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+      <div class="flex gap-3">
+        <!-- History -->
+        <button (click)="viewHistory()"
+          class="flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 transition hover:bg-white/10">
+          <ion-icon name="time-outline" class="text-xl"></ion-icon>
+        </button>
+
+        <!-- Leaderboard -->
+        <button (click)="viewLeaderboard()"
+          class="flex h-10 w-10 items-center justify-center rounded-lg bg-white/5 transition hover:bg-white/10">
+          <ion-icon name="trophy-outline" class="text-xl"></ion-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Hero Image -->
+    <div class="relative h-64 overflow-hidden">
+      <img src="https://images.unsplash.com/photo-1470506926202-05d3fca84c9a" class="h-full w-full object-cover"
+        alt="Treasure Hunt" />
+      <div class="absolute inset-0 bg-gradient-to-t from-[#191919] via-transparent to-transparent"></div>
+    </div>
+
+    <!-- Content -->
+    <div class="-mt-8 relative z-10 flex-1 px-6">
+      <div class="rounded-2xl border border-white/5 bg-[#252525] p-6">
+
+        <!-- Welcome -->
+        <div class="mb-4 flex items-center gap-3">
+          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/10">
+            <ion-icon name="compass-outline" class="text-2xl text-blue-400"></ion-icon>
+          </div>
+          <div>
+            <h2 class="text-xl font-medium">Willkommen</h2>
+            <p class="text-sm text-gray-400">Bereit für ein Abenteuer?</p>
+          </div>
+        </div>
+
+        <p class="mb-6 leading-relaxed text-gray-300">
+          Begib dich auf eine spannende Schnitzeljagd durch die Stadt. Löse Aufgaben,
+          sammle Schnitzel und kämpfe um den ersten Platz.
+        </p>
+
+        <!-- Name Input -->
+        <ng-container *ngIf="!showPermissions; else permissionBlock">
+          <div class="mb-6">
+            <label class="mb-2 block text-sm text-gray-400">Dein Name</label>
+            <input [(ngModel)]="name" (keyup.enter)="startClick()" placeholder="Namen eingeben..."
+              class="w-full rounded-xl border border-white/10 bg-[#1a1a1a] px-4 py-3 focus:border-blue-500/50 focus:outline-none transition" />
+          </div>
+
+          <!-- Primary CTA -->
+          <button (click)="startClick()"
+            class="flex h-12 w-full items-center justify-center rounded-xl bg-blue-500 font-medium transition hover:bg-blue-600">
+            Schnitzeljagd starten
+          </button>
+        </ng-container>
+
+        <!-- Permissions -->
+        <ng-template #permissionBlock>
+          <div class="space-y-4">
+            <div class="rounded-xl border border-white/5 bg-[#1a1a1a] p-4">
+              <h3 class="mb-3 font-medium">Berechtigungen erforderlich</h3>
+              <p class="mb-4 text-sm text-gray-400">
+                Für die Schnitzeljagd benötigen wir folgende Berechtigungen
+              </p>
+
+              <div class="mb-4 space-y-3">
+                <!-- Location -->
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <ion-icon name="location-outline" class="text-blue-400"></ion-icon>
+                    <span class="text-sm">Standort</span>
+                  </div>
+                  <span *ngIf="locationPermission" class="rounded bg-green-400/10 px-2 py-1 text-xs text-green-400">
+                    Erteilt
+                  </span>
+                </div>
+
+                <!-- Camera -->
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <ion-icon name="camera-outline" class="text-blue-400"></ion-icon>
+                    <span class="text-sm">Kamera</span>
+                  </div>
+                  <span *ngIf="cameraPermission" class="rounded bg-green-400/10 px-2 py-1 text-xs text-green-400">
+                    Erteilt
+                  </span>
+                </div>
+              </div>
+
+              <!-- Permission CTA -->
+              <button *ngIf="!cameraPermission || !locationPermission; else startGameBtn" (click)="requestPermissions()"
+                class="flex h-11 w-full items-center justify-center rounded-lg bg-blue-500 text-sm font-medium transition hover:bg-blue-600">
+                Berechtigungen erteilen
+              </button>
+
+              <ng-template #startGameBtn>
+                <button (click)="startGame()"
+                  class="flex h-11 w-full items-center justify-center rounded-lg bg-green-500 text-sm font-medium transition hover:bg-green-600">
+                  Jetzt starten
+                </button>
+              </ng-template>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Features -->
+      <div class="mb-6 mt-6 grid grid-cols-3 gap-3">
+        <div class="rounded-xl border border-white/5 bg-[#252525] p-4 text-center">
+          <div class="mb-1 text-2xl">🍖</div>
+          <div class="text-xs text-gray-400">Schnitzel sammeln</div>
+        </div>
+        <div class="rounded-xl border border-white/5 bg-[#252525] p-4 text-center">
+          <div class="mb-1 text-2xl">📍</div>
+          <div class="text-xs text-gray-400">Orte erkunden</div>
+        </div>
+        <div class="rounded-xl border border-white/5 bg-[#252525] p-4 text-center">
+          <div class="mb-1 text-2xl">🏆</div>
+          <div class="text-xs text-gray-400">Highscore jagen</div>
+        </div>
+      </div>
+
+    </div>
   </div>
 </ion-content>
