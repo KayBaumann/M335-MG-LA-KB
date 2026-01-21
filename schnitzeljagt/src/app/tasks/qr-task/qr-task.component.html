@@ -1,0 +1,84 @@
+<div class="space-y-4">
+
+  <!-- Camera Preview -->
+  <div class="relative aspect-square overflow-hidden rounded-xl
+           border border-white/5 bg-[#1a1a1a]">
+
+    <!-- Idle -->
+    <ng-container *ngIf="!scanning; else scanningTpl">
+      <img src="https://images.unsplash.com/photo-1569908420024-c8f709b75700"
+        class="h-full w-full object-cover opacity-30" />
+
+      <div class="absolute inset-0 flex flex-col items-center justify-center">
+
+        <div class="relative w-48 h-48 rounded-xl border-2 border-blue-400/50">
+          <div class="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-blue-400 rounded-tl-lg"></div>
+          <div class="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-blue-400 rounded-tr-lg"></div>
+          <div class="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-blue-400 rounded-bl-lg"></div>
+          <div class="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-blue-400 rounded-br-lg"></div>
+
+          <div class="absolute inset-0 flex items-center justify-center">
+            <ion-icon name="camera-outline" class="text-5xl text-blue-400/50"></ion-icon>
+          </div>
+        </div>
+
+        <p class="mt-4 text-sm text-gray-400">
+          Positioniere den QR-Code im Rahmen
+        </p>
+      </div>
+    </ng-container>
+
+    <!-- Scanning -->
+    <ng-template #scanningTpl>
+      <div class="flex h-full w-full flex-col items-center justify-center">
+        <div class="mb-4 h-16 w-16 rounded-full border-4
+                 border-blue-400 border-t-transparent animate-spin"></div>
+        <p class="text-sm text-gray-400">Scanne QR-Code…</p>
+      </div>
+    </ng-template>
+
+  </div>
+
+  <!-- Scan Result -->
+  <div *ngIf="scannedContent" class="rounded-xl p-4 border animate-fade-in" [ngClass]="isCorrect
+      ? 'bg-green-500/10 border-green-500/20'
+      : 'bg-red-500/10 border-red-500/20'">
+    <div class="flex items-center gap-3">
+
+      <ng-container *ngIf="isCorrect; else wrongTpl">
+        <ion-icon name="checkmark-circle" class="text-green-400 text-xl"></ion-icon>
+        <div>
+          <p class="text-sm font-medium text-green-400">
+            Richtiger QR-Code!
+          </p>
+          <p class="mt-0.5 text-xs text-green-400/70">
+            Aufgabe wird abgeschlossen…
+          </p>
+        </div>
+      </ng-container>
+
+      <ng-template #wrongTpl>
+        <div class="flex h-5 w-5 items-center justify-center rounded-full bg-red-400/20">
+          <span class="text-sm text-red-400">✕</span>
+        </div>
+        <div>
+          <p class="text-sm font-medium text-red-400">
+            Falscher QR-Code
+          </p>
+          <p class="mt-0.5 text-xs text-red-400/70">
+            Bitte scanne den richtigen Code
+          </p>
+        </div>
+      </ng-template>
+
+    </div>
+  </div>
+
+  <!-- Simulate Button -->
+  <button (click)="simulateScan()" class="h-12 w-full rounded-xl bg-blue-500
+           text-sm font-medium text-white
+           transition hover:bg-blue-600 disabled:opacity-50" [disabled]="scanning || completed">
+    {{ scanning ? 'Scanne…' : 'QR-Code scannen' }}
+  </button>
+
+</div>

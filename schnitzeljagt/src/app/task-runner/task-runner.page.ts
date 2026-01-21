@@ -5,6 +5,7 @@ import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { GeolocationTaskComponent } from '../tasks/geolocation-task/geolocation-task.component';
 import { DistanceTaskComponent } from '../tasks/distance-task/distance-task.component';
 import { SensorTaskComponent } from '../tasks/sensor-task/sensor-task.component';
+import { QrTaskComponent } from '../tasks/qr-task/qr-task.component';
 import { Task } from '../models/task.model';
 import { Router } from '@angular/router';
 
@@ -15,7 +16,7 @@ import { Router } from '@angular/router';
   templateUrl: './task-runner.page.html',
   styleUrls: ['./task-runner.page.scss'],
   standalone: true,
-  imports: [IonContent, CommonModule, FormsModule, IonIcon, GeolocationTaskComponent, DistanceTaskComponent, SensorTaskComponent]
+  imports: [IonContent, CommonModule, FormsModule, IonIcon, GeolocationTaskComponent, DistanceTaskComponent, SensorTaskComponent, QrTaskComponent]
 })
 export class TaskRunnerPage implements OnInit {
 
@@ -24,8 +25,8 @@ export class TaskRunnerPage implements OnInit {
   tasks: Task[] = [
     {
       id: '1',
-      title: 'Finde den richtigen Ort',
-      description: 'Begebe dich zu dem markierten Punkt auf der Karte.',
+      title: 'Finde den Standort',
+      description: 'Begib dich zum vorgegebenen Koordinaten. GPS-Genauigkeit: 20 Meter Umkreis.',
       type: 'geolocation',
     },
     {
@@ -36,9 +37,15 @@ export class TaskRunnerPage implements OnInit {
     },
     {
       id: '3',
-      title: 'Drehe dein Gerät auf den Kopf für 3 Sekunden.',
-      description: 'Drehe dein Gerät auf den Kopf',
+      title: 'Gerät auf den kopf',
+      description: 'Drehe dein Gerät auf den Kopf für 3 Sekunden',
       type: 'sensor',
+    },
+    {
+      id: '4',
+      title: 'Scanne den QR-Code',
+      description: 'Finde und scanne den versteckten QR-Code um fortzufahren.',
+      type: 'qr',
     }
   ];
 

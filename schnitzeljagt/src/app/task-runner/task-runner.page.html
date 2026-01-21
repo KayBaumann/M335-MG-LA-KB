@@ -65,7 +65,7 @@
       <ng-container [ngSwitch]="task.type">
         <app-geolocation-task *ngSwitchCase="'geolocation'" (complete)="complete()"></app-geolocation-task>
 
-        <!-- <app-qr-task *ngSwitchCase="'qr'" (complete)="complete()"></app-qr-task> -->
+        <app-qr-task *ngSwitchCase="'qr'" (complete)="complete()"></app-qr-task>
 
         <app-distance-task *ngSwitchCase="'distance'" (complete)="complete()"></app-distance-task>
 
