@@ -26,73 +26,63 @@
   </div>
 
   <!-- Richtungsanzeige im Google Maps Stil -->
-  <div class="rounded-2xl border border-white/5 bg-[#252525] p-5">
-    <div class="flex items-center justify-between">
-      <div>
-        <div class="text-sm text-gray-400">Navigation</div>
-        <div class="text-base font-medium text-white">Folge dem Pfeil</div>
+  <!-- Compass Ring -->
+  <div class="mt-5 flex items-center justify-center">
+    <div class="relative h-44 w-44">
+
+      <!-- Background -->
+      <div class="absolute inset-0 rounded-full bg-[#1a1a1a]"></div>
+      <div class="absolute inset-0 rounded-full border border-white/10"></div>
+
+      <!-- North Marker -->
+      <div class="absolute left-1/2 top-2 -translate-x-1/2 text-[10px] font-semibold text-gray-300">
+        N
       </div>
 
-      <div class="rounded-xl bg-white/5 px-3 py-2 text-xs text-gray-300">
-        {{ bearingToTargetDegrees | number:'1.0-0' }}°
-      </div>
-    </div>
-
-    <!-- Compass Ring -->
-    <div class="mt-5 flex items-center justify-center">
-      <div class="relative h-44 w-44">
-
-        <!-- Ring Hintergrund -->
-        <div class="absolute inset-0 rounded-full bg-[#1a1a1a]"></div>
-
-        <!-- Ring Outline -->
-        <div class="absolute inset-0 rounded-full border border-white/10"></div>
-
-        <!-- N Markierung -->
-        <div class="absolute left-1/2 top-2 -translate-x-1/2 text-[10px] font-semibold text-gray-300">
-          N
+      <!-- Target Pin -->
+      <div class="absolute left-1/2 top-1/2 transition-transform duration-500 ease-out" [style.transform]="
+        'translate(-50%, -50%) translate(' +
+        targetIndicatorOffset.x + 'px,' +
+        targetIndicatorOffset.y + 'px)'
+      ">
+        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md">
+          <ion-icon name="location" class="text-xl text-red-500"></ion-icon>
         </div>
+      </div>
 
-        <!-- Subtile Ticks -->
-        <div class="absolute inset-0 rounded-full border border-white/5"></div>
-
-        <!-- Rotierender Pfeil -->
-        <div class="absolute inset-0 flex items-center justify-center">
-          <div
-            class="relative flex h-28 w-28 items-center justify-center rounded-full bg-blue-500/15 transition-transform duration-500"
-            [style.transform]="'rotate(' + bearingToTargetDegrees + 'deg)'">
-            <!-- Pfeil Icon -->
-            <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-500 shadow-sm">
-              <ion-icon name="navigate" class="text-4xl text-white"></ion-icon>
-            </div>
-
-            <!-- Spitze Highlight -->
-            <div class="absolute -top-4 left-1/2 -translate-x-1/2">
-              <div class="h-2 w-2 rounded-full bg-white/70"></div>
-            </div>
+      <!-- Direction Arrow -->
+      <div class="absolute inset-0 flex items-center justify-center">
+        <div
+          class="flex h-28 w-28 items-center justify-center rounded-full bg-blue-500/15 transition-transform duration-300"
+          [style.transform]="'rotate(' + bearingToTargetDegrees + 'deg)'">
+          <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-500 shadow-sm">
+            <ion-icon name="navigate" class="text-4xl text-white"></ion-icon>
           </div>
         </div>
-
-        <!-- Center Dot -->
-        <div class="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/60"></div>
       </div>
+
+      <!-- Center Dot -->
+      <div class="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/60">
+      </div>
+
     </div>
+  </div>
 
-    <!-- Bottom Info Bar wie Original -->
-    <div class="mt-5 w-full rounded-xl bg-white px-4 py-3 shadow-sm">
-      <div class="flex items-center justify-between">
-        <div class="flex flex-col">
-          <span class="text-sm text-gray-500">Entfernung</span>
-          <span class="text-lg font-semibold text-gray-900">
-            {{ distanceToTargetMeters == null ? '...' : (distanceToTargetMeters | number:'1.0-0') + ' m' }}
-          </span>
+
+  <!-- Bottom Info Bar wie Original -->
+  <div class="mt-5 w-full rounded-xl bg-white px-4 py-3 shadow-sm">
+    <div class="flex items-center justify-between">
+      <div>
+        <div class="text-sm text-gray-500">Entfernung</div>
+        <div class="text-lg font-semibold text-gray-900">
+          {{ distanceToTargetMeters == null ? '...' : (distanceToTargetMeters | number:'1.0-0') + ' m' }}
         </div>
+      </div>
 
-        <div class="flex flex-col text-right">
-          <span class="text-sm text-gray-500">Ziel</span>
-          <span class="text-sm font-medium text-gray-900">
-            {{ TARGET_NAME }}
-          </span>
+      <div class="text-right">
+        <div class="text-sm text-gray-500">Ziel</div>
+        <div class="text-sm font-medium text-gray-900">
+          {{ TARGET_NAME }}
         </div>
       </div>
     </div>
@@ -122,5 +112,3 @@
     class="rounded-xl border border-green-500/20 bg-green-500/10 p-4 text-center text-sm text-green-400">
     🎉 Ziel erreicht
   </div>
-
-</div>

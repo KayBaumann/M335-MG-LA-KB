@@ -6,7 +6,7 @@ import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
 
 import {addIcons} from 'ionicons'
-import {heart, star, timeOutline, trophyOutline, compassOutline, locationOutline, cameraOutline, pin, trophy, closeOutline, playSkipForwardOutline, checkmarkCircleOutline, navigate, locateOutline, syncOutline } from 'ionicons/icons'
+import {heart, star, timeOutline, trophyOutline, compassOutline, locationOutline, cameraOutline, pin, trophy, closeOutline, playSkipForwardOutline, checkmarkCircleOutline, navigate, locateOutline, syncOutline, navigateOutline } from 'ionicons/icons'
 
 addIcons({
   'heart': heart,
@@ -23,7 +23,13 @@ addIcons({
   'checkmark-circle-outline': checkmarkCircleOutline,
   'navigate': navigate,
   'locate-atOutline': locateOutline,
-  'sync-outline': syncOutline
+  'sync-outline': syncOutline,
+  'navigate-outline': navigateOutline,
+  'qr-code-outline': cameraOutline,
+  'walk-outline': pin,
+  'speedometer-outline': star,
+  'flash-outline': heart,
+  'wifi-outline': syncOutline,
 })
 
 bootstrapApplication(AppComponent, {
