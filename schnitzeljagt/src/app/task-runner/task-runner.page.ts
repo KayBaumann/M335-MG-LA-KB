@@ -5,6 +5,7 @@ import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { GeolocationTaskComponent } from '../tasks/geolocation-task/geolocation-task.component';
 import { DistanceTaskComponent } from '../tasks/distance-task/distance-task.component';
 import { SensorTaskComponent } from '../tasks/sensor-task/sensor-task.component';
+import { PowerTaskComponent } from '../tasks/power-task/power-task.component';
 import { Task } from '../models/task.model';
 import { Router } from '@angular/router';
 
@@ -15,7 +16,7 @@ import { Router } from '@angular/router';
   templateUrl: './task-runner.page.html',
   styleUrls: ['./task-runner.page.scss'],
   standalone: true,
-  imports: [IonContent, CommonModule, FormsModule, IonIcon, GeolocationTaskComponent, DistanceTaskComponent, SensorTaskComponent]
+  imports: [IonContent, CommonModule, FormsModule, IonIcon, GeolocationTaskComponent, DistanceTaskComponent, SensorTaskComponent, PowerTaskComponent],
 })
 export class TaskRunnerPage implements OnInit {
 
@@ -30,7 +31,7 @@ export class TaskRunnerPage implements OnInit {
     },
     {
       id: '2',
-      title: 'Gehe eine bestimmte Distanz',
+      title: 'Gehe eine besvffrftimmte Distanz',
       description: 'Bewege dich mindestens 20 Meter.',
       type: 'distance',
     },
@@ -39,6 +40,12 @@ export class TaskRunnerPage implements OnInit {
       title: 'Drehe dein Gerät auf den Kopf für 3 Sekunden.',
       description: 'Drehe dein Gerät auf den Kopf',
       type: 'sensor',
+    },
+    {
+      id: '4',
+      title: 'Gerät aufladen',
+      description: 'Verbinde dein Gerät mit dem Strom oder einem Ladekabel.',
+      type: 'power',
     }
   ];
 
