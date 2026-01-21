@@ -51,7 +51,7 @@
         <ng-container *ngIf="!showPermissions; else permissionBlock">
           <div class="mb-6">
             <label class="mb-2 block text-sm text-gray-400">Dein Name</label>
-            <input [(ngModel)]="name" (keyup.enter)="startClick()" placeholder="Namen eingeben..."
+            <input [(ngModel)]="name" (keyup.enter)="startClick()" placeholder="Max Mustermann"
               class="w-full rounded-xl border border-white/10 bg-[#1a1a1a] px-4 py-3 focus:border-blue-500/50 focus:outline-none transition" />
           </div>
 
@@ -114,16 +114,16 @@
 
       <!-- Features -->
       <div class="mb-6 mt-6 grid grid-cols-3 gap-3">
-        <div class="rounded-xl border border-white/5 bg-[#252525] p-4 text-center">
-          <div class="mb-1 text-2xl">🍖</div>
+        <div class="flex flex-col items-center justify-center rounded-xl border border-white/5 bg-[#252525] p-4 text-center">
+          <img src="../../assets/icon/schnitzel.png" alt="Schnitzel" class="mb-1 h-7" />
           <div class="text-xs text-gray-400">Schnitzel sammeln</div>
         </div>
         <div class="rounded-xl border border-white/5 bg-[#252525] p-4 text-center">
-          <div class="mb-1 text-2xl">📍</div>
+          <ion-icon name="pin-filled" class="mb-1 text-2xl"></ion-icon>
           <div class="text-xs text-gray-400">Orte erkunden</div>
         </div>
         <div class="rounded-xl border border-white/5 bg-[#252525] p-4 text-center">
-          <div class="mb-1 text-2xl">🏆</div>
+          <ion-icon name="trophy-filled" class="mb-1 text-2xl"></ion-icon>
           <div class="text-xs text-gray-400">Highscore jagen</div>
         </div>
       </div>

@@ -25,7 +25,8 @@ export class HomePage {
   }
 
   startClick(){
-    console.log("Start button clicked");
+    if (!this.name.trim()) return;
+    this.showPermissions = true;
   }
 
   viewHistory(){
@@ -37,7 +38,8 @@ export class HomePage {
   }
 
   requestPermissions(){
-    console.log("Request Permissions clicked");
+    this.locationPermission = true;
+    this.cameraPermission = true;
   }
 
 

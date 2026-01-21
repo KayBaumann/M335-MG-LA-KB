@@ -10,4 +10,8 @@ export const routes: Routes = [
     redirectTo: 'home',
     pathMatch: 'full',
   },
+  {
+    path: 'task-runner',
+    loadComponent: () => import('./task-runner/task-runner.page').then( m => m.TaskRunnerPage)
+  },
 ];
