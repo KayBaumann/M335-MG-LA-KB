@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { GeolocationTaskComponent } from '../tasks/geolocation-task/geolocation-task.component';
 import { DistanceTaskComponent } from '../tasks/distance-task/distance-task.component';
+import { SensorTaskComponent } from '../tasks/sensor-task/sensor-task.component';
 import { Task } from '../models/task.model';
 import { Router } from '@angular/router';
 
@@ -14,7 +15,7 @@ import { Router } from '@angular/router';
   templateUrl: './task-runner.page.html',
   styleUrls: ['./task-runner.page.scss'],
   standalone: true,
-  imports: [IonContent, CommonModule, FormsModule, IonIcon, GeolocationTaskComponent, DistanceTaskComponent]
+  imports: [IonContent, CommonModule, FormsModule, IonIcon, GeolocationTaskComponent, DistanceTaskComponent, SensorTaskComponent]
 })
 export class TaskRunnerPage implements OnInit {
 
@@ -33,6 +34,12 @@ export class TaskRunnerPage implements OnInit {
       description: 'Bewege dich mindestens 20 Meter.',
       type: 'distance',
     },
+    {
+      id: '3',
+      title: 'Drehe dein Gerät auf den Kopf für 3 Sekunden.',
+      description: 'Drehe dein Gerät auf den Kopf',
+      type: 'sensor',
+    }
   ];
 
   currentTaskIndex = 0;

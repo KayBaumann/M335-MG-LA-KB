@@ -1,0 +1,57 @@
+<div class="space-y-4">
+
+  <!-- Device Illustration -->
+  <div class="rounded-xl p-8 border border-purple-500/20
+           bg-gradient-to-br from-purple-500/10 to-pink-500/10">
+    <div class="text-center">
+
+      <div class="inline-flex items-center justify-center
+               w-24 h-24 rounded-2xl bg-purple-500/10 mb-4
+               transition-transform duration-300 ease-out" [class.rotate-180]="isUpsideDown">
+        <ion-icon name="phone-portrait-outline" class="text-4xl text-purple-400"></ion-icon>
+      </div>
+
+      <p class="text-sm text-gray-400">
+        {{ isUpsideDown
+        ? 'Halte das Gerät… ' + (HOLD_DURATION - holdTime).toFixed(1) + 's'
+        : 'Drehe dein Gerät auf den Kopf'
+        }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div *ngIf="isUpsideDown && !completed" class="rounded-xl p-4 border border-white/5 bg-[#1a1a1a]">
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-sm text-gray-400">Halte Position</span>
+      <span class="text-sm text-gray-300 font-medium">
+        {{ holdTime.toFixed(1) }}s / {{ HOLD_DURATION }}s
+      </span>
+    </div>
+
+    <div class="h-3 w-full rounded-full bg-white/5 overflow-hidden">
+      <div class="h-full rounded-full
+               bg-gradient-to-r from-purple-500 to-pink-500
+               transition-all duration-100" [style.width.%]="progressPercent"></div>
+    </div>
+  </div>
+
+  <!-- Completion -->
+  <div *ngIf="completed" class="rounded-xl p-4 border border-green-500/20 bg-green-500/10
+           animate-fade-in">
+    <div class="flex items-center justify-center gap-2">
+      <ion-icon name="checkmark-circle" class="text-green-400 text-xl"></ion-icon>
+      <p class="text-sm font-medium text-green-400">
+        Perfekt! Aufgabe abgeschlossen!
+      </p>
+    </div>
+  </div>
+
+  <!-- Web Simulation Button -->
+  <button (click)="toggleOrientation()" class="w-full h-12 rounded-xl
+           bg-white/5 text-sm text-gray-300
+           transition hover:bg-white/10">
+    Simulation: Gerät drehen
+  </button>
+
+</div>
