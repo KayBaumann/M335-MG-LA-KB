@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonIcon } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
@@ -9,7 +10,10 @@ import { FormsModule } from '@angular/forms';
   imports: [IonContent , IonIcon, CommonModule, FormsModule, IonIcon],
 })
 export class HomePage {
-  constructor() {}
+  constructor(
+
+    private router: Router
+  ) {}
 
   showPermissions = false;
 
@@ -21,7 +25,7 @@ export class HomePage {
 
 
   startGame(){
-    console.log("Game Started");
+    this.router.navigate(['/tasks']);
   }
 
   startClick(){

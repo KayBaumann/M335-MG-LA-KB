@@ -11,7 +11,7 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
-    path: 'task-runner',
+    path: 'tasks',
     loadComponent: () => import('./task-runner/task-runner.page').then( m => m.TaskRunnerPage)
   },
 ];

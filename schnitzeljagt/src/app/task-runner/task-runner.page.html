@@ -1,13 +1,103 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>TaskRunner</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content fullscreen class="min-h-screen bg-gradient-to-br from-[#191919] via-[#1a1a1a] to-[#0d0d0d]">
+  <div class="flex min-h-screen flex-col text-white">
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">TaskRunner</ion-title>
-    </ion-toolbar>
-  </ion-header>
+    <!-- Header -->
+    <div class="border-b border-white/5 bg-[#252525]/50 backdrop-blur-lg px-6 py-4">
+      <div class="mb-3 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-sm text-gray-400">Aufgabe</span>
+          <span class="text-sm font-medium">
+            {{ taskNumber }} / {{ totalTasks }}
+          </span>
+        </div>
+
+        <button (click)="abort()"
+          class="flex h-9 w-9 items-center justify-center rounded-lg bg-red-500/10 text-red-400 transition hover:bg-red-500/20">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
+        <div class="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-500"
+          [style.width.%]="progress"></div>
+      </div>
+    </div>
+
+    <!-- Task Content -->
+    <div class="flex-1 overflow-y-auto px-6 py-6">
+
+      <!-- Task Header -->
+      <div class="mb-6 rounded-2xl border border-white/5 bg-[#252525] p-6">
+        <div class="flex items-start gap-4">
+          <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400">
+            <ion-icon [name]="taskIcon" class="text-xl"></ion-icon>
+          </div>
+
+          <div class="flex-1">
+            <div class="mb-2 flex items-start justify-between gap-2">
+              <h2 class="text-xl font-medium">{{ task.title }}</h2>
+
+              <span *ngIf="task.required" class="rounded bg-orange-500/10 px-2 py-1 text-xs text-orange-400">
+                Pflicht
+              </span>
+            </div>
+
+            <p class="text-sm leading-relaxed text-gray-400">
+              {{ task.description }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timer -->
+      <div class="mb-6 rounded-xl border border-white/5 bg-[#252525] p-4">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-400">Zeit</span>
+
+          <div class="flex items-center gap-2">
+            <span class="font-mono" [class.text-orange-400]="elapsed > 120" [class.text-gray-300]="elapsed <= 120">
+              {{ formatTime(elapsed) }}
+            </span>
+
+            <span *ngIf="elapsed > 120" class="text-xs">🥔</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Task Component Switch -->
+      <ng-container [ngSwitch]="task.type">
+        <app-geolocation-task *ngSwitchCase="'geolocation'" (complete)="complete()"></app-geolocation-task>
+
+        <!-- <app-qr-task *ngSwitchCase="'qr'" (complete)="complete()"></app-qr-task> -->
+
+        <app-distance-task *ngSwitchCase="'distance'" (complete)="complete()"></app-distance-task>
+
+        <!-- <app-sensor-task *ngSwitchCase="'sensor'" (complete)="complete()"></app-sensor-task> -->
+
+        <!-- <app-power-task *ngSwitchCase="'power'" (complete)="complete()"></app-power-task> -->
+
+        <!-- <app-wifi-task *ngSwitchCase="'wifi'" (complete)="complete()"></app-wifi-task> -->
+      </ng-container>
+    </div>
+
+    <!-- Actions -->
+    <div class="border-t border-white/5 bg-[#252525]/50 backdrop-blur-lg p-6">
+      <div class="flex gap-3">
+
+        <button *ngIf="!task.required" (click)="skip()"
+          class="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-white/5 transition hover:bg-white/10">
+          <ion-icon name="play-skip-forward-outline"></ion-icon>
+          <span>Überspringen</span>
+        </button>
+
+        <button (click)="complete()"
+          class="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-green-500 font-medium transition hover:bg-green-600">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          <span>Abschließen</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
 </ion-content>
