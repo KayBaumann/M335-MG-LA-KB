@@ -46,6 +46,12 @@ export class TaskRunnerPage implements OnInit {
       title: 'Scanne den QR-Code',
       description: 'Finde und scanne den versteckten QR-Code um fortzufahren.',
       type: 'qr',
+    },
+    {
+      id: '6',
+      title: 'WLAN Verbindungsaufgabe',
+      description: 'Verbinde dich mit einem WLAN-Netzwerk und trenne die Verbindung wieder.',
+      type: 'wifi',
     }
   ];
 
