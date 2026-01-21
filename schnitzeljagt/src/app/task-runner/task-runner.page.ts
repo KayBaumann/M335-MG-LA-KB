@@ -39,6 +39,12 @@ export class TaskRunnerPage implements OnInit {
       title: 'Drehe dein Gerät auf den Kopf für 3 Sekunden.',
       description: 'Drehe dein Gerät auf den Kopf',
       type: 'sensor',
+    },
+    {
+      id: '6',
+      title: 'WLAN Verbindungsaufgabe',
+      description: 'Verbinde dich mit einem WLAN-Netzwerk und trenne die Verbindung wieder.',
+      type: 'wifi',
     }
   ];
 
