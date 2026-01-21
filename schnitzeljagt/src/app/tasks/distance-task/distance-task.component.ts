@@ -1,14 +1,33 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { IonButton, IonIcon } from '@ionic/angular/standalone';
+import { DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-distance-task',
+  standalone: true,
+  imports: [
+    IonButton,
+    IonIcon,
+    DecimalPipe
+  ],
   templateUrl: './distance-task.component.html',
-  styleUrls: ['./distance-task.component.scss'],
+  styleUrls: ['./distance-task.component.scss']
 })
-export class DistanceTaskComponent  implements OnInit {
+export class DistanceTaskComponent {
+  readonly TARGET_DISTANCE = 20;
 
-  constructor() { }
+  tracking = false;
+  distance = 0;
 
-  ngOnInit() {}
+  get progress(): number {
+    return Math.min((this.distance / this.TARGET_DISTANCE) * 100, 100);
+  }
 
+  startTracking() {
+    this.tracking = true;
+  }
+
+  pauseTracking() {
+    this.tracking = false;
+  }
 }
