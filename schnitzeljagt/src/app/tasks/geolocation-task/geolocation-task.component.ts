@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { BaseTask } from '../base-task/base-task';
 import { DecimalPipe } from '@angular/common';
 import { IonIcon } from '@ionic/angular/standalone';
+import { NavigationService } from 'src/app/navigation-service';
 
 interface GeoPosition {
   latitude: number;
@@ -16,6 +17,7 @@ interface GeoPosition {
 })
 export class GeolocationTaskComponent extends BaseTask implements OnInit {
 
+  constructor(private navigation: NavigationService) { super(); }
 
   readonly TARGET_LATITUDE = 47.0502;
   readonly TARGET_LONGITUDE = 8.3093;
@@ -30,31 +32,26 @@ export class GeolocationTaskComponent extends BaseTask implements OnInit {
 
 
 
-  ngOnInit() {
-    const sumulatedLatitude =
-      this.TARGET_LATITUDE + (Math.random() - 0.5) * 0.001; // +/- ~55m
-    const sumulatedLongitude =
-      this.TARGET_LONGITUDE + (Math.random() - 0.5) * 0.001; // +/- ~55m
+  async ngOnInit() {
+    const current = await this.navigation.getCurrentPosition();
 
-    this.currentPosition = {
-      latitude: sumulatedLatitude,
-      longitude: sumulatedLongitude
+    const target = {
+      latitude: this.TARGET_LATITUDE,
+      longitude: this.TARGET_LONGITUDE
     };
 
-    this.distanceToTargetMeters = this.calculateDistanceMeters(
-      this.currentPosition.latitude,
-      this.currentPosition.longitude,
-      this.TARGET_LATITUDE,
-      this.TARGET_LONGITUDE
-    );
+    this.distanceToTargetMeters =
+      this.navigation.getDistanceMeters(current, target);
 
-    this.bearingToTargetDegrees = this.calculateBearingDegrees(
-      this.currentPosition.latitude,
-      this.currentPosition.longitude,
-      this.TARGET_LATITUDE,
-      this.TARGET_LONGITUDE
-    );
+    const bearing =
+      this.navigation.getBearingDegrees(current, target);
+
+    this.navigation.watchHeading(deviceHeading => {
+      this.bearingToTargetDegrees =
+        (bearing - deviceHeading + 360) % 360;
+    });
   }
+
   get targetIndicatorOffset() {
     if (this.distanceToTargetMeters == null) {
       return { x: 0, y: 0 };

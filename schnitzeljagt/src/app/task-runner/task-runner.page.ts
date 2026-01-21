@@ -30,7 +30,7 @@ export class TaskRunnerPage implements OnInit {
     {
       id: '2',
       title: 'Gehe eine bestimmte Distanz',
-      description: 'Bewege dich mindestens 100 Meter.',
+      description: 'Bewege dich mindestens 20 Meter.',
       type: 'distance',
     },
   ];
