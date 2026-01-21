@@ -75,7 +75,7 @@ export class TaskRunnerPage implements OnInit {
   }
 
   skip() {
-    console.log('skipped');
+    this.taskNumber++;
   }
 
   complete() {
