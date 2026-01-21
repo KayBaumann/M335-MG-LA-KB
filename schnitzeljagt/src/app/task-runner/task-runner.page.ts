@@ -1,9 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonIcon} from '@ionic/angular/standalone';
+import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { GeolocationTaskComponent } from '../tasks/geolocation-task/geolocation-task.component';
 import { DistanceTaskComponent } from '../tasks/distance-task/distance-task.component';
+import { Task } from '../models/task.model';
+import { Router } from '@angular/router';
+
+
 
 @Component({
   selector: 'app-task-runner',
@@ -14,20 +18,27 @@ import { DistanceTaskComponent } from '../tasks/distance-task/distance-task.comp
 })
 export class TaskRunnerPage implements OnInit {
 
-  constructor() { }
+  constructor(private router: Router) { }
 
-  taskNumber = 1;
-  totalTasks = 5;
+  tasks: Task[] = [
+    {
+      id: '1',
+      title: 'Finde den richtigen Ort',
+      description: 'Begebe dich zu dem markierten Punkt auf der Karte.',
+      type: 'geolocation',
+    },
+    {
+      id: '2',
+      title: 'Gehe eine bestimmte Distanz',
+      description: 'Bewege dich mindestens 100 Meter.',
+      type: 'distance',
+    },
+  ];
+
+  currentTaskIndex = 0;
 
   elapsed = 0;
   private timer?: any;
-
-  task = {
-    title: 'Finde den richtigen Ort',
-    description: 'Begebe dich zu dem markierten Punkt auf der Karte.',
-    type: 'geolocation',
-    required: true,
-  };
 
   ngOnInit() {
     this.timer = setInterval(() => {
@@ -39,10 +50,21 @@ export class TaskRunnerPage implements OnInit {
     clearInterval(this.timer);
   }
 
+  get task(): Task {
+    return this.tasks[this.currentTaskIndex];
+  }
+
   get progress(): number {
     return (this.taskNumber / this.totalTasks) * 100;
   }
 
+  get taskNumber(): number {
+    return this.currentTaskIndex + 1;
+  }
+
+  get totalTasks(): number {
+    return this.tasks.length;
+  }
   get taskIcon(): string {
     switch (this.task.type) {
       case 'geolocation':
@@ -75,11 +97,22 @@ export class TaskRunnerPage implements OnInit {
   }
 
   skip() {
-    console.log('skipped');
+    this.complete();
   }
 
   complete() {
-    console.log('completed');
+    if (this.currentTaskIndex < this.tasks.length - 1) {
+      this.currentTaskIndex++;
+      return;
+    }
+
+    // letzte Task erledigt → nächste Page
+    this.finishRun();
+  }
+
+
+  finishRun() {
+    this.router.navigate(['/summary'], { replaceUrl: true });
   }
 
 }

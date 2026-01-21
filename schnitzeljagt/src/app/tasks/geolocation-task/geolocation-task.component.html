@@ -1,10 +1,126 @@
-<div class="rounded-xl border border-white/5 bg-[#252525] p-4">
-  <p class="mb-4 text-sm text-gray-400">
-    Begib dich zum markierten Punkt.
-  </p>
+<div class="space-y-4">
 
-  <button (click)="checkLocation()"
-    class="flex h-12 w-full items-center justify-center rounded-xl bg-blue-500 transition hover:bg-blue-600">
-    Standort prüfen
+  <!-- Destination Card wie im Original -->
+  <div class="overflow-hidden rounded-2xl border border-white/5 bg-[#1a1a1a]">
+    <div class="relative h-48">
+      <img src="https://images.unsplash.com/photo-1615547340694-c3269985e1ea?auto=format&fit=crop&w=1400&q=80"
+        alt="Ziel" class="h-full w-full object-cover" />
+      <div class="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-[#1a1a1a]/20 to-transparent"></div>
+
+      <div class="absolute bottom-4 left-4 right-4">
+        <div class="flex items-center gap-2">
+          <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/15">
+            <ion-icon name="location-outline" class="text-xl text-blue-400"></ion-icon>
+          </div>
+          <div class="flex-1">
+            <div class="text-lg font-medium text-white">
+              {{ TARGET_NAME }}
+            </div>
+            <div class="text-sm text-gray-300">
+              Zielort für diese Aufgabe
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Richtungsanzeige im Google Maps Stil -->
+  <div class="rounded-2xl border border-white/5 bg-[#252525] p-5">
+    <div class="flex items-center justify-between">
+      <div>
+        <div class="text-sm text-gray-400">Navigation</div>
+        <div class="text-base font-medium text-white">Folge dem Pfeil</div>
+      </div>
+
+      <div class="rounded-xl bg-white/5 px-3 py-2 text-xs text-gray-300">
+        {{ bearingToTargetDegrees | number:'1.0-0' }}°
+      </div>
+    </div>
+
+    <!-- Compass Ring -->
+    <div class="mt-5 flex items-center justify-center">
+      <div class="relative h-44 w-44">
+
+        <!-- Ring Hintergrund -->
+        <div class="absolute inset-0 rounded-full bg-[#1a1a1a]"></div>
+
+        <!-- Ring Outline -->
+        <div class="absolute inset-0 rounded-full border border-white/10"></div>
+
+        <!-- N Markierung -->
+        <div class="absolute left-1/2 top-2 -translate-x-1/2 text-[10px] font-semibold text-gray-300">
+          N
+        </div>
+
+        <!-- Subtile Ticks -->
+        <div class="absolute inset-0 rounded-full border border-white/5"></div>
+
+        <!-- Rotierender Pfeil -->
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div
+            class="relative flex h-28 w-28 items-center justify-center rounded-full bg-blue-500/15 transition-transform duration-500"
+            [style.transform]="'rotate(' + bearingToTargetDegrees + 'deg)'">
+            <!-- Pfeil Icon -->
+            <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-500 shadow-sm">
+              <ion-icon name="navigate" class="text-4xl text-white"></ion-icon>
+            </div>
+
+            <!-- Spitze Highlight -->
+            <div class="absolute -top-4 left-1/2 -translate-x-1/2">
+              <div class="h-2 w-2 rounded-full bg-white/70"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Center Dot -->
+        <div class="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/60"></div>
+      </div>
+    </div>
+
+    <!-- Bottom Info Bar wie Original -->
+    <div class="mt-5 w-full rounded-xl bg-white px-4 py-3 shadow-sm">
+      <div class="flex items-center justify-between">
+        <div class="flex flex-col">
+          <span class="text-sm text-gray-500">Entfernung</span>
+          <span class="text-lg font-semibold text-gray-900">
+            {{ distanceToTargetMeters == null ? '...' : (distanceToTargetMeters | number:'1.0-0') + ' m' }}
+          </span>
+        </div>
+
+        <div class="flex flex-col text-right">
+          <span class="text-sm text-gray-500">Ziel</span>
+          <span class="text-sm font-medium text-gray-900">
+            {{ TARGET_NAME }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Button wie Original -->
+  <button (click)="checkLocation()" [disabled]="isCheckingLocation"
+    class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-blue-500 font-medium transition hover:bg-blue-600 disabled:bg-white/5">
+    <ion-icon *ngIf="!isCheckingLocation" name="locate-outline" class="text-lg"></ion-icon>
+    <ion-icon *ngIf="isCheckingLocation" name="sync-outline" class="text-lg animate-spin"></ion-icon>
+    <span>{{ isCheckingLocation ? 'Prüfe Position...' : 'Position überprüfen' }}</span>
   </button>
+
+  <!-- Status Hinweise -->
+  <div *ngIf="distanceToTargetMeters !== null && distanceToTargetMeters > TARGET_RADIUS_METERS"
+    class="rounded-xl border border-orange-500/20 bg-orange-500/10 p-4 text-center text-sm text-orange-400">
+    Du bist noch
+    {{
+    (distanceToTargetMeters ?? 0) - TARGET_RADIUS_METERS
+    | number:'1.0-0'
+    }}
+    m vom Ziel entfernt
+  </div>
+
+
+  <div *ngIf="distanceToTargetMeters != null && distanceToTargetMeters <= TARGET_RADIUS_METERS"
+    class="rounded-xl border border-green-500/20 bg-green-500/10 p-4 text-center text-sm text-green-400">
+    🎉 Ziel erreicht
+  </div>
+
 </div>
