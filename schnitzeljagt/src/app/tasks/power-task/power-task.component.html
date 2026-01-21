@@ -1,71 +1,74 @@
 <div class="task-wrapper">
+  <ng-container *ngIf="!initialLoading; else loadingState">
+    <!-- Battery Display -->
+    <div class="battery-card">
+      <div class="center">
+        <div class="icon-circle">
+          <ng-container *ngIf="isCharging; else notCharging">
+            <ion-icon name="battery-charging-outline" class="battery-icon charging"></ion-icon>
+            <div class="zap-badge">
+              <ion-icon name="flash" class="zap"></ion-icon>
+            </div>
+          </ng-container>
 
-  <!-- Battery Display -->
-  <div class="battery-card">
-    <div class="center">
-      <div class="icon-circle">
-        <ng-container *ngIf="isCharging; else notCharging">
-          <ion-icon name="battery-charging-outline" class="battery-icon charging"></ion-icon>
-          <div class="zap-badge">
-            <ion-icon name="flash" class="zap"></ion-icon>
-          </div>
+          <ng-template #notCharging>
+            <ion-icon name="battery-half-outline" class="battery-icon idle"></ion-icon>
+          </ng-template>
+        </div>
+
+        <div class="level">
+          <span class="level-number">{{ batteryLevel }}%</span>
+        </div>
+
+        <p class="subtitle">
+          {{ isCharging ? 'Wird geladen' : 'Nicht am Strom' }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="status-card">
+      <div class="status-row">
+        <span class="label">Ladestatus</span>
+        <div class="status-right">
+          <span class="dot" [class.dot-on]="isCharging"></span>
+          <span class="status-text" [class.status-on]="isCharging">
+            {{ isCharging ? 'Verbunden' : 'Getrennt' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="status-row">
+        <span class="label">Batteriestand</span>
+        <span class="value">{{ batteryLevel }}%</span>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <ion-button expand="block" class="primary-btn" [disabled]="checking || completed" (click)="checkPowerStatus()">
+        <ng-container *ngIf="!checking; else loading">
+          <ion-icon slot="start" name="search"></ion-icon>
+          Status prüfen
         </ng-container>
 
-        <ng-template #notCharging>
-          <ion-icon name="battery-half-outline" class="battery-icon idle"></ion-icon>
+        <ng-template #loading>
+          <ion-spinner name="crescent" class="spinner"></ion-spinner>
+          Prüfe…
         </ng-template>
-      </div>
+      </ion-button>
 
-      <div class="level">
-        <span class="level-number">{{ batteryLevel }}%</span>
-      </div>
-
-      <p class="subtitle">
-        {{ isCharging ? 'Wird geladen' : 'Nicht am Strom' }}
-      </p>
-    </div>
-  </div>
-
-  <!-- Status -->
-  <div class="status-card">
-    <div class="status-row">
-      <span class="label">Ladestatus</span>
-      <div class="status-right">
-        <span class="dot" [class.dot-on]="isCharging"></span>
-        <span class="status-text" [class.status-on]="isCharging">
-          {{ isCharging ? 'Verbunden' : 'Getrennt' }}
-        </span>
+      <div class="done" *ngIf="completed">
+        <ion-icon name="checkmark-circle" class="done-icon"></ion-icon>
+        <span>Aufgabe abgeschlossen</span>
       </div>
     </div>
+  </ng-container>
 
-    <div class="status-row">
-      <span class="label">Batteriestand</span>
-      <span class="value">{{ batteryLevel }}%</span>
+  <ng-template #loadingState>
+    <div class="loading-screen">
+      <ion-spinner name="crescent" class="initial-spinner"></ion-spinner>
+      <p class="loading-text">Batteriestatus wird geprüft…</p>
     </div>
-  </div>
-
-  <!-- Controls -->
-  <div class="controls">
-    <ion-button
-      expand="block"
-      class="primary-btn"
-      [disabled]="checking || completed"
-      (click)="checkPowerStatus()">
-      <ng-container *ngIf="!checking; else loading">
-        <ion-icon slot="start" name="search"></ion-icon>
-        Status prüfen
-      </ng-container>
-
-      <ng-template #loading>
-        <ion-spinner name="crescent" class="spinner"></ion-spinner>
-        Prüfe…
-      </ng-template>
-    </ion-button>
-
-    <div class="done" *ngIf="completed">
-      <ion-icon name="checkmark-circle" class="done-icon"></ion-icon>
-      <span>Aufgabe abgeschlossen</span>
-    </div>
-  </div>
-
+  </ng-template>
 </div>

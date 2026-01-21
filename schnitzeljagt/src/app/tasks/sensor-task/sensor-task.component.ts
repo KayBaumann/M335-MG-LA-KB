@@ -1,6 +1,8 @@
 import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonIcon } from '@ionic/angular/standalone';
+import { Motion } from '@capacitor/motion';
+import { PluginListenerHandle } from '@capacitor/core';
 
 @Component({
   selector: 'app-sensor-task',
@@ -18,6 +20,9 @@ export class SensorTaskComponent implements OnDestroy {
 
   readonly HOLD_DURATION = 3;
 
+  private motionListener?: PluginListenerHandle;
+  private holdInterval?: any;
+
   toggleOrientation() {
     if (this.completed) return;
 
@@ -31,7 +36,9 @@ export class SensorTaskComponent implements OnDestroy {
   }
 
   private startHoldTimer() {
-    this.intervalId = setInterval(() => {
+    if (this.holdInterval) return;
+
+    this.holdInterval = setInterval(() => {
       this.holdTime = Math.min(
         this.holdTime + 0.1,
         this.HOLD_DURATION
@@ -44,18 +51,18 @@ export class SensorTaskComponent implements OnDestroy {
   }
 
   private reset() {
-    clearInterval(this.intervalId);
+    clearInterval(this.holdInterval);
+    this.holdInterval = undefined;
     this.holdTime = 0;
   }
 
+
   private complete() {
-    clearInterval(this.intervalId);
+    clearInterval(this.holdInterval);
+    this.holdInterval = undefined;
     this.completed = true;
 
-    setTimeout(() => {
-      // onComplete Callback
-      console.log('Task completed');
-    }, 800);
+    console.log('Task completed');
   }
 
   get progressPercent() {
@@ -63,6 +70,29 @@ export class SensorTaskComponent implements OnDestroy {
   }
 
   ngOnDestroy() {
-    clearInterval(this.intervalId);
+    this.motionListener?.remove();
+    clearInterval(this.holdInterval);
+  }
+
+  async ngOnInit() {
+    this.motionListener = await Motion.addListener(
+      'accel',
+      event => {
+        if (this.completed) return;
+
+        const y = event.accelerationIncludingGravity?.y ?? 0;
+        const upsideDown = y < -7;
+
+        if (upsideDown !== this.isUpsideDown) {
+          this.isUpsideDown = upsideDown;
+
+          if (upsideDown) {
+            this.startHoldTimer();
+          } else {
+            this.reset();
+          }
+        }
+      }
+    );
   }
 }
