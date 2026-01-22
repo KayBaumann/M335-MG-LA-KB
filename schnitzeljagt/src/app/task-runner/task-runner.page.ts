@@ -7,6 +7,7 @@ import { DistanceTaskComponent } from '../tasks/distance-task/distance-task.comp
 import { SensorTaskComponent } from '../tasks/sensor-task/sensor-task.component';
 import { QrTaskComponent } from '../tasks/qr-task/qr-task.component';
 import { PowerTaskComponent } from '../tasks/power-task/power-task.component';
+import { WifiTaskComponent } from '../tasks/wifi-task/wifi-task.component';
 import { Task } from '../models/task.model';
 import { Router } from '@angular/router';
 
@@ -17,7 +18,7 @@ import { Router } from '@angular/router';
   templateUrl: './task-runner.page.html',
   styleUrls: ['./task-runner.page.scss'],
   standalone: true,
-  imports: [IonContent, CommonModule, FormsModule, IonIcon, GeolocationTaskComponent, DistanceTaskComponent, SensorTaskComponent, QrTaskComponent, PowerTaskComponent]
+  imports: [IonContent, CommonModule, FormsModule, IonIcon, GeolocationTaskComponent, DistanceTaskComponent, SensorTaskComponent, QrTaskComponent, PowerTaskComponent, WifiTaskComponent]
 })
 export class TaskRunnerPage implements OnInit {
 

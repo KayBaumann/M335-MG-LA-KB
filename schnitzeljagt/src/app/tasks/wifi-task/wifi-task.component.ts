@@ -1,53 +1,71 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
+import { NgIf } from '@angular/common';
+import { IonButton, IonIcon, IonSpinner } from '@ionic/angular/standalone';
 import { Network } from '@capacitor/network';
 
 @Component({
   selector: 'app-wifi-task',
+  standalone: true,
+  imports: [NgIf, IonButton, IonIcon, IonSpinner],
   templateUrl: './wifi-task.component.html',
-  styleUrls: ['./wifi-task.component.scss']
+  styleUrls: ['./wifi-task.component.scss'],
 })
-export class WifiTaskComponent implements OnInit, OnDestroy {
+export class WifiTaskComponent {
 
+  isWifiConnected = false;
   wasConnected = false;
   wasDisconnected = false;
-  taskCompleted = false;
 
-  private listener: any;
+  completed = false;
+  checking = false;
+  initialLoading = true;
 
-  async ngOnInit() {
-    // Initialer Status
-    const status = await Network.getStatus();
-    this.handleStatus(status);
+  private networkListener?: any;
 
-    // Listener für Änderungen
-    this.listener = Network.addListener(
-      'networkStatusChange',
-      status => this.handleStatus(status)
-    );
+  async checkWifiStatus() {
+    this.checking = true;
+
+    try {
+      const status = await Network.getStatus();
+      this.handleStatus(status);
+    } finally {
+      this.checking = false;
+    }
   }
 
-  handleStatus(status: any) {
-    if (status.connected && status.connectionType === 'wifi') {
+  private handleStatus(status: any) {
+    this.isWifiConnected =
+      status.connected && status.connectionType === 'wifi';
+
+    if (this.isWifiConnected) {
       this.wasConnected = true;
     }
 
-    if (!status.connected && this.wasConnected) {
+    if (!this.isWifiConnected && this.wasConnected) {
       this.wasDisconnected = true;
     }
 
     if (this.wasConnected && this.wasDisconnected) {
-      this.taskCompleted = true;
-      this.onTaskCompleted();
+      this.completed = true;
     }
   }
 
-  onTaskCompleted() {
-    console.log('WLAN Task abgeschlossen');
+  async ngOnInit() {
+    const status = await Network.getStatus();
+    this.handleStatus(status);
+    this.initialLoading = false;
+
+    this.networkListener = Network.addListener(
+      'networkStatusChange',
+      status => {
+        if (!this.completed) {
+          this.handleStatus(status);
+        }
+      }
+    );
   }
 
   ngOnDestroy() {
-    if (this.listener) {
-      this.listener.remove();
-    }
+    this.networkListener?.remove();
   }
 }
