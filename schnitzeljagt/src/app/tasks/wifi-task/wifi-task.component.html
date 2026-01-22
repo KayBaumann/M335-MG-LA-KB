@@ -1,43 +1,78 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>WLAN Aufgabe</ion-title>
-  </ion-toolbar>
-</ion-header>
+<div class="task-wrapper">
+  <ng-container *ngIf="!initialLoading; else loadingState">
 
-<ion-content class="ion-padding">
+    <!-- WIFI DISPLAY -->
+    <div class="wifi-card">
+      <div class="center">
+        <div class="icon-circle">
+          <ion-icon
+            name="wifi"
+            class="wifi-icon"
+            [class.connected]="isWifiConnected"
+            [class.disconnected]="!isWifiConnected">
+          </ion-icon>
+        </div>
 
-  <h2>WLAN verbinden & trennen</h2>
+        <p class="subtitle">
+          {{ isWifiConnected ? 'WLAN verbunden' : 'WLAN getrennt' }}
+        </p>
+      </div>
+    </div>
 
-  <p>
-    Verbinde dein Gerät einmal mit einem WLAN
-    und trenne danach die Verbindung wieder.
-  </p>
+    <!-- STATUS -->
+    <div class="status-card">
+      <div class="status-row">
+        <span class="label">WLAN Status</span>
+        <div class="status-right">
+          <span class="dot" [class.dot-on]="isWifiConnected"></span>
+          <span class="status-text" [class.status-on]="isWifiConnected">
+            {{ isWifiConnected ? 'Verbunden' : 'Getrennt' }}
+          </span>
+        </div>
+      </div>
 
-  <ion-list>
-    <ion-item>
-      <ion-label>WLAN verbunden</ion-label>
-      <ion-icon
-        [name]="wasConnected ? 'checkmark-circle' : 'ellipse-outline'"
-        slot="end"
-        color="success">
-      </ion-icon>
-    </ion-item>
+      <div class="status-row">
+        <span class="label">Einmal verbunden</span>
+        <span class="value">{{ wasConnected ? 'Ja' : 'Nein' }}</span>
+      </div>
 
-    <ion-item>
-      <ion-label>WLAN getrennt</ion-label>
-      <ion-icon
-        [name]="wasDisconnected ? 'checkmark-circle' : 'ellipse-outline'"
-        slot="end"
-        color="success">
-      </ion-icon>
-    </ion-item>
-  </ion-list>
+      <div class="status-row">
+        <span class="label">Einmal getrennt</span>
+        <span class="value">{{ wasDisconnected ? 'Ja' : 'Nein' }}</span>
+      </div>
+    </div>
 
-  <ion-button
-    expand="block"
-    color="success"
-    [disabled]="!taskCompleted">
-    Aufgabe abschliessen
-  </ion-button>
+    <!-- CONTROLS -->
+    <div class="controls">
+      <ion-button
+        expand="block"
+        class="primary-btn"
+        [disabled]="checking || completed"
+        (click)="checkWifiStatus()">
 
-</ion-content>
+        <ng-container *ngIf="!checking; else loading">
+          <ion-icon slot="start" name="wifi"></ion-icon>
+          Status prüfen
+        </ng-container>
+
+        <ng-template #loading>
+          <ion-spinner name="crescent" class="spinner"></ion-spinner>
+          Prüfe…
+        </ng-template>
+      </ion-button>
+
+      <div class="done" *ngIf="completed">
+        <ion-icon name="checkmark-circle" class="done-icon"></ion-icon>
+        <span>Aufgabe abgeschlossen</span>
+      </div>
+    </div>
+
+  </ng-container>
+
+  <ng-template #loadingState>
+    <div class="loading-screen">
+      <ion-spinner name="crescent" class="initial-spinner"></ion-spinner>
+      <p class="loading-text">WLAN-Status wird geprüft…</p>
+    </div>
+  </ng-template>
+</div>
