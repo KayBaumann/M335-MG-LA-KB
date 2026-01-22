@@ -14,4 +14,9 @@ export const routes: Routes = [
     path: 'tasks',
     loadComponent: () => import('./task-runner/task-runner.page').then( m => m.TaskRunnerPage)
   },
+  {
+    path: 'result-screen',
+    loadComponent: () => import('./result-screen/result-screen.page').then( m => m.ResultsPage)
+  },
+
 ];

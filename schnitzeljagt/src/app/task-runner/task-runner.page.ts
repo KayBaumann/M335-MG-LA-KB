@@ -140,7 +140,7 @@ export class TaskRunnerPage implements OnInit {
 
 
   finishRun() {
-    this.router.navigate(['/summary'], { replaceUrl: true });
+    this.router.navigate(['/result-screen'], { replaceUrl: true });
   }
 
 }

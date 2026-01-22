@@ -1,0 +1,47 @@
+<ion-content class="ion-padding">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="trophy">
+      <ion-icon name="trophy"></ion-icon>
+    </div>
+    <h1>Geschafft!</h1>
+    <p>Glückwunsch, {{ result.playerName }}!</p>
+  </div>
+
+  <!-- SCORE -->
+  <div class="score-card">
+    <div class="points">{{ totalPoints }}</div>
+    <p class="label">Gesamtpunkte</p>
+
+    <div class="grid">
+      <div class="stat">
+        <div class="emoji">🍖</div>
+        <strong>{{ result.schnitzel }}</strong>
+        <small>Schnitzel</small>
+      </div>
+      <div class="stat">
+        <div class="emoji">🥔</div>
+        <strong>{{ result.kartoffeln }}</strong>
+        <small>Kartoffeln</small>
+      </div>
+      <div class="stat">
+        <div class="emoji">⏱️</div>
+        <strong>{{ formatDuration(result.duration) }}</strong>
+        <small>Zeit</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="actions">
+    <ion-button expand="block" color="primary" (click)="viewLeaderboard()">
+      Leaderboard anzeigen
+    </ion-button>
+
+    <ion-button expand="block" fill="outline" (click)="playAgain()">
+      Nochmal spielen
+    </ion-button>
+  </div>
+
+</ion-content>
