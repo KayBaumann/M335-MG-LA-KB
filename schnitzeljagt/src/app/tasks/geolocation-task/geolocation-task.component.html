@@ -1,114 +1,42 @@
-<div class="space-y-4">
+<div class="geolocation-task">
 
-  <!-- Destination Card wie im Original -->
-  <div class="overflow-hidden rounded-2xl border border-white/5 bg-[#1a1a1a]">
-    <div class="relative h-48">
-      <img src="https://images.unsplash.com/photo-1615547340694-c3269985e1ea?auto=format&fit=crop&w=1400&q=80"
-        alt="Ziel" class="h-full w-full object-cover" />
-      <div class="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-[#1a1a1a]/20 to-transparent"></div>
+  <!-- MAP WRAPPER -->
+  <div class="map-wrapper">
+    <iframe
+      class="map-frame"
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d812.989985956724!2d8.301078303022049!3d47.027332351026224!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x478ffb6fc48be237%3A0x85cb29370bce2b77!2sThe%20Jack&#39;s%20House%20%7C%20Restaurant%20Kriens!5e1!3m2!1sde!2sch!4v1769085990018!5m2!1sde!2sch"
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade">
+    </iframe>
+  </div>
 
-      <div class="absolute bottom-4 left-4 right-4">
-        <div class="flex items-center gap-2">
-          <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/15">
-            <ion-icon name="location-outline" class="text-xl text-blue-400"></ion-icon>
-          </div>
-          <div class="flex-1">
-            <div class="text-lg font-medium text-white">
-              {{ TARGET_NAME }}
-            </div>
-            <div class="text-sm text-gray-300">
-              Zielort für diese Aufgabe
-            </div>
-          </div>
-        </div>
+  <!-- INFO BANNER -->
+  <div class="info-banner">
+
+    <div class="info-card">
+      <div class="icon-wrapper">
+        <ion-icon name="map-outline"></ion-icon>
+      </div>
+      <div class="info-content">
+        <span class="label">Distanz zum Ziel</span>
+        <span class="value" [ngClass]="getDistanceColorClass()">
+          {{ getFormattedDistance() }}
+        </span>
       </div>
     </div>
-  </div>
 
-  <!-- Richtungsanzeige im Google Maps Stil -->
-  <!-- Compass Ring -->
-  <div class="mt-5 flex items-center justify-center">
-    <div class="relative h-44 w-44">
-
-      <!-- Background -->
-      <div class="absolute inset-0 rounded-full bg-[#1a1a1a]"></div>
-      <div class="absolute inset-0 rounded-full border border-white/10"></div>
-
-      <!-- North Marker -->
-      <div class="absolute left-1/2 top-2 -translate-x-1/2 text-[10px] font-semibold text-gray-300">
-        N
+    <div class="info-card">
+      <div class="icon-wrapper">
+        <ion-icon [name]="isWithinTargetDistance ? 'trophy-outline' : 'navigate-outline'"></ion-icon>
       </div>
-
-      <!-- Target Pin -->
-      <div class="absolute left-1/2 top-1/2 transition-transform duration-500 ease-out" [style.transform]="
-        'translate(-50%, -50%) translate(' +
-        targetIndicatorOffset.x + 'px,' +
-        targetIndicatorOffset.y + 'px)'
-      ">
-        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md">
-          <ion-icon name="location" class="text-xl text-red-500"></ion-icon>
-        </div>
-      </div>
-
-      <!-- Direction Arrow -->
-      <div class="absolute inset-0 flex items-center justify-center">
-        <div
-          class="flex h-28 w-28 items-center justify-center rounded-full bg-blue-500/15 transition-transform duration-300"
-          [style.transform]="'rotate(' + bearingToTargetDegrees + 'deg)'">
-          <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-500 shadow-sm">
-            <ion-icon name="navigate" class="text-4xl text-white"></ion-icon>
-          </div>
-        </div>
-      </div>
-
-      <!-- Center Dot -->
-      <div class="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/60">
-      </div>
-
-    </div>
-  </div>
-
-
-  <!-- Bottom Info Bar wie Original -->
-  <div class="mt-5 w-full rounded-xl bg-white px-4 py-3 shadow-sm">
-    <div class="flex items-center justify-between">
-      <div>
-        <div class="text-sm text-gray-500">Entfernung</div>
-        <div class="text-lg font-semibold text-gray-900">
-          {{ distanceToTargetMeters == null ? '...' : (distanceToTargetMeters | number:'1.0-0') + ' m' }}
-        </div>
-      </div>
-
-      <div class="text-right">
-        <div class="text-sm text-gray-500">Ziel</div>
-        <div class="text-sm font-medium text-gray-900">
-          {{ TARGET_NAME }}
-        </div>
+      <div class="info-content">
+        <span class="label">Status</span>
+        <span class="value">
+          {{ isWithinTargetDistance ? 'Ziel erreicht' : 'Unterwegs zum Ziel' }}
+        </span>
       </div>
     </div>
+
   </div>
 
-  <!-- Action Button wie Original -->
-  <button (click)="checkLocation()" [disabled]="isCheckingLocation"
-    class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-blue-500 font-medium transition hover:bg-blue-600 disabled:bg-white/5">
-    <ion-icon *ngIf="!isCheckingLocation" name="locate-outline" class="text-lg"></ion-icon>
-    <ion-icon *ngIf="isCheckingLocation" name="sync-outline" class="text-lg animate-spin"></ion-icon>
-    <span>{{ isCheckingLocation ? 'Prüfe Position...' : 'Position überprüfen' }}</span>
-  </button>
-
-  <!-- Status Hinweise -->
-  <div *ngIf="distanceToTargetMeters !== null && distanceToTargetMeters > TARGET_RADIUS_METERS"
-    class="rounded-xl border border-orange-500/20 bg-orange-500/10 p-4 text-center text-sm text-orange-400">
-    Du bist noch
-    {{
-    (distanceToTargetMeters ?? 0) - TARGET_RADIUS_METERS
-    | number:'1.0-0'
-    }}
-    m vom Ziel entfernt
-  </div>
-
-
-  <div *ngIf="distanceToTargetMeters != null && distanceToTargetMeters <= TARGET_RADIUS_METERS"
-    class="rounded-xl border border-green-500/20 bg-green-500/10 p-4 text-center text-sm text-green-400">
-    🎉 Ziel erreicht
-  </div>
+</div>

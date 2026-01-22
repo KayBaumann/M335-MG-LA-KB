@@ -1,131 +1,344 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, NgZone, ChangeDetectorRef } from '@angular/core';
 import { BaseTask } from '../base-task/base-task';
-import { DecimalPipe } from '@angular/common';
-import { IonIcon } from '@ionic/angular/standalone';
 import { NavigationService } from 'src/app/navigation-service';
+import { CommonModule } from '@angular/common';
+import { IonIcon } from '@ionic/angular/standalone';
+import { Geolocation, Position } from '@capacitor/geolocation';
+import * as L from 'leaflet';
 
-interface GeoPosition {
-  latitude: number;
-  longitude: number;
-}
 
 @Component({
   selector: 'app-geolocation-task',
   templateUrl: './geolocation-task.component.html',
   styleUrls: ['./geolocation-task.component.scss'],
-  imports: [DecimalPipe, IonIcon],
+  standalone: true,
+  imports: [CommonModule, IonIcon],
 })
-export class GeolocationTaskComponent extends BaseTask implements OnInit {
+export class GeolocationTaskComponent extends BaseTask implements OnInit, OnDestroy {
+  private ngZone = inject(NgZone);
+  private cdr = inject(ChangeDetectorRef);
+  // Target destination (McDonald's in Lucerne)
+  readonly TARGET_LATITUDE = 47.027455400650055;
+  readonly TARGET_LONGITUDE = 8.301320050820248;
+  readonly TARGET_DISTANCE_THRESHOLD = 10; // meters
 
-  constructor(private navigation: NavigationService) { super(); }
+  // User's current position
+  userLatitude: number | null = null;
+  userLongitude: number | null = null;
 
-  readonly TARGET_LATITUDE = 47.0502;
-  readonly TARGET_LONGITUDE = 8.3093;
-  readonly TARGET_RADIUS_METERS: number = 20;
-  readonly TARGET_NAME = "Mattenhof 8 Migros";
+  // Distance to target in meters
+  distanceToTarget: number | null = null;
 
-  currentPosition: GeoPosition | null = null;
-  distanceToTargetMeters: number | null = null;
-  bearingToTargetDegrees: number = 0;
+  // Geolocation tracking identifier
+  geolocationWatchId: string | null = null;
 
-  isCheckingLocation = false;
+  // Timer display
+  timeRemaining = '5:00';
+
+  // Location tracking status
+  isTrackingLocation = false;
+  locationError: string | null = null;
+  permissionStatus: string = 'checking';
+
+  // Target reached status
+  isWithinTargetDistance = false;
+
+  constructor() { super(); }
+
+  map!: L.Map;
+  userMarker!: L.Marker;
+  targetMarker!: L.Marker;
+
+
+  ngOnInit() {
+    this.initializeLocationTracking();
+  }
+
+  ngOnDestroy() {
+    this.stopLocationTracking();
+  }
+
+  private initMap() {
+    if (this.map) return;
+
+    this.map = L.map('map', {
+      zoomControl: false,
+      attributionControl: false,
+    }).setView(
+      [this.TARGET_LATITUDE, this.TARGET_LONGITUDE],
+      16
+    );
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+    }).addTo(this.map);
+
+    this.targetMarker = L.marker(
+      [this.TARGET_LATITUDE, this.TARGET_LONGITUDE]
+    ).addTo(this.map);
+  }
 
 
 
-  async ngOnInit() {
-    const current = await this.navigation.getCurrentPosition();
+  /**
+   * Initialize location tracking with permission check
+   */
+  async initializeLocationTracking() {
+    try {
+      // Check current permission status
+      const permissionStatus = await Geolocation.checkPermissions();
+      console.log('Permission status:', permissionStatus);
 
-    const target = {
-      latitude: this.TARGET_LATITUDE,
-      longitude: this.TARGET_LONGITUDE
-    };
+      if (permissionStatus.location === 'granted') {
+        this.permissionStatus = 'granted';
+        await this.startLocationTracking();
+      } else if (permissionStatus.location === 'prompt' || permissionStatus.location === 'prompt-with-rationale') {
+        // Request permission
+        const requestResult = await Geolocation.requestPermissions();
+        console.log('Permission request result:', requestResult);
 
-    this.distanceToTargetMeters =
-      this.navigation.getDistanceMeters(current, target);
+        if (requestResult.location === 'granted') {
+          this.permissionStatus = 'granted';
+          await this.startLocationTracking();
+        } else {
+          this.permissionStatus = 'denied';
+          this.locationError = 'Standortzugriff verweigert. Bitte aktivieren Sie die Standortberechtigung in den Einstellungen.';
+        }
+      } else {
+        this.permissionStatus = 'denied';
+        this.locationError = 'Standortzugriff verweigert. Bitte aktivieren Sie die Standortberechtigung in den Einstellungen.';
+      }
+    } catch (error) {
+      console.error('Error initializing location:', error);
+      this.locationError = 'Fehler beim Initialisieren der Standortverfolgung.';
+    }
+  }
 
-    const bearing =
-      this.navigation.getBearingDegrees(current, target);
+  /**
+   * Start tracking user's location in real-time
+   */
+  async startLocationTracking() {
+    try {
+      this.isTrackingLocation = true;
+      this.locationError = null;
 
-    this.navigation.watchHeading(deviceHeading => {
-      this.bearingToTargetDegrees =
-        (bearing - deviceHeading + 360) % 360;
+      const options: PositionOptions = {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      };
+
+      // Watch position changes
+      this.geolocationWatchId = await Geolocation.watchPosition(
+        options,
+        (position, error) => {
+          if (error) {
+            this.handleLocationError(error);
+          } else if (position) {
+            this.handleLocationUpdate(position);
+          }
+        }
+      );
+
+      console.log('Location tracking started with ID:', this.geolocationWatchId);
+    } catch (error) {
+      console.error('Error starting location tracking:', error);
+      this.locationError = 'Fehler beim Starten der Standortverfolgung.';
+      this.isTrackingLocation = false;
+    }
+  }
+
+  /**
+   * Stop tracking user's location
+   */
+  async stopLocationTracking() {
+    if (this.geolocationWatchId !== null) {
+      try {
+        await Geolocation.clearWatch({ id: this.geolocationWatchId });
+        console.log('Location tracking stopped');
+      } catch (error) {
+        console.error('Error stopping location tracking:', error);
+      }
+      this.geolocationWatchId = null;
+      this.isTrackingLocation = false;
+    }
+  }
+
+  /**
+   * Handle successful location update
+   */
+  /**
+   * Handle successful location update
+   * Wrapped in NgZone to ensure automatic change detection
+   */  /**
+* Handle location tracking errors
+*/
+  /**
+   * Handle successful location update
+   * Wrapped in NgZone to ensure automatic change detection
+   */
+  private handleLocationUpdate(position: Position | null) {
+    if (!position || !position.coords) {
+      console.warn('Invalid position data received');
+      return;
+    }
+
+    // Run inside Angular zone to trigger automatic change detection
+    this.ngZone.run(() => {
+      this.userLatitude = position.coords.latitude;
+      this.userLongitude = position.coords.longitude;
+      this.locationError = null;
+
+      if (!this.map) {
+        this.initMap();
+      } 
+      const userLatLng: L.LatLngExpression = [
+        this.userLatitude!,
+        this.userLongitude!
+      ];
+
+      if (!this.userMarker) {
+        this.userMarker = L.marker(userLatLng).addTo(this.map);
+      } else {
+        this.userMarker.setLatLng(userLatLng);
+      }
+
+      this.map.setView(userLatLng, 16);
+
+      // Always recalculate distance when position updates
+      this.calculateDistanceToTarget();
+
+      console.log('Location updated:', {
+        latitude: this.userLatitude,
+        longitude: this.userLongitude,
+        accuracy: position.coords.accuracy,
+        distance: this.distanceToTarget,
+        withinRange: this.isWithinTargetDistance
+      });
+
+      if (this.isWithinTargetDistance) {
+        console.log('🎯 Target reached! Within threshold distance.');
+      }
+
+      // Force change detection to ensure UI updates
+      this.cdr.detectChanges();
     });
   }
 
-  get targetIndicatorOffset() {
-    if (this.distanceToTargetMeters == null) {
-      return { x: 0, y: 0 };
+  /**
+ * Handle location tracking errors
+ */
+  private handleLocationError(error: any) {
+    this.ngZone.run(() => {
+      this.isTrackingLocation = false;
+      console.error('Location error:', error);
+
+      if (error.message) {
+        this.locationError = `Standortfehler: ${error.message}`;
+      } else {
+        this.locationError = 'Fehler beim Abrufen des Standorts.';
+      }
+
+      this.cdr.detectChanges();
+    });
+  }
+  /**
+   * Calculate distance from user to target using Haversine formula
+   */
+  /**
+   * Calculate distance from user to target using Haversine formula
+   */
+  calculateDistanceToTarget() {
+    if (this.userLatitude === null || this.userLongitude === null) {
+      console.warn('Cannot calculate distance: coordinates not available');
+      this.distanceToTarget = null;
+      this.isWithinTargetDistance = false;
+      return;
     }
 
-    const MAX_VISIBLE_RANGE_METERS = 120;
-    const clambedDistance = Math.min(
-      this.distanceToTargetMeters,
-      MAX_VISIBLE_RANGE_METERS
-    );
+    const EARTH_RADIUS_METERS = 6371e3;
 
-    const distanceRatio = clambedDistance / MAX_VISIBLE_RANGE_METERS;
-    const radians = (this.bearingToTargetDegrees * Math.PI) / 180;
+    const userLatitudeRadians = this.degreesToRadians(this.userLatitude);
+    const targetLatitudeRadians = this.degreesToRadians(this.TARGET_LATITUDE);
+    const latitudeDifferenceRadians = this.degreesToRadians(this.TARGET_LATITUDE - this.userLatitude);
+    const longitudeDifferenceRadians = this.degreesToRadians(this.TARGET_LONGITUDE - this.userLongitude);
 
-    return {
-      x: Math.sin(radians) * distanceRatio * 50,
-      y: -Math.cos(radians) * distanceRatio * 50
-    };
+    const haversineA =
+      Math.sin(latitudeDifferenceRadians / 2) * Math.sin(latitudeDifferenceRadians / 2) +
+      Math.cos(userLatitudeRadians) * Math.cos(targetLatitudeRadians) *
+      Math.sin(longitudeDifferenceRadians / 2) * Math.sin(longitudeDifferenceRadians / 2);
+
+    const haversineC = 2 * Math.atan2(Math.sqrt(haversineA), Math.sqrt(1 - haversineA));
+
+    this.distanceToTarget = Math.round(EARTH_RADIUS_METERS * haversineC);
+
+    // Check if user is within target distance
+    const previousStatus = this.isWithinTargetDistance;
+    this.isWithinTargetDistance = this.distanceToTarget <= this.TARGET_DISTANCE_THRESHOLD;
+
+    // Log when status changes
+    if (previousStatus !== this.isWithinTargetDistance) {
+      console.log(`Distance status changed: ${this.isWithinTargetDistance ? 'WITHIN' : 'OUTSIDE'} target range`);
+    }
   }
 
-  checkLocation() {
-    if (this.isCheckingLocation) return;
-
-    this.isCheckingLocation = true;
-
-    setTimeout(() => {
-      this.isCheckingLocation = false;
-
-      if (
-        this.distanceToTargetMeters != null &&
-        this.distanceToTargetMeters <= this.TARGET_RADIUS_METERS
-      ) {
-        setTimeout(() => this.finish(), 1000);
-      }
-    }, 1000);
+  private degreesToRadians(degrees: number): number {
+    return degrees * Math.PI / 180;
   }
 
-  private calculateDistanceMeters(
-    lat1: number,
-    lon1: number,
-    lat2: number,
-    lon2: number
-  ): number {
-    const EARTH_RADIUS = 6371e3;
+  /**
+   * Format coordinates for display
+   */
+  getFormattedCoordinates(): string {
+    if (this.userLatitude === null || this.userLongitude === null) {
+      return 'Warte auf Standort...';
+    }
 
-    const φ1 = (lat1 * Math.PI) / 180;
-    const φ2 = (lat2 * Math.PI) / 180;
-    const Δφ = ((lat2 - lat1) * Math.PI) / 180;
-    const Δλ = ((lon2 - lon1) * Math.PI) / 180;
-    const a =
-      Math.sin(Δφ / 2) ** 2 +
-      Math.cos(φ1) *
-      Math.cos(φ2) *
-      Math.sin(Δλ / 2) ** 2;
+    const latitudeDirection = this.userLatitude >= 0 ? 'N' : 'S';
+    const longitudeDirection = this.userLongitude >= 0 ? 'E' : 'W';
 
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return EARTH_RADIUS * c;
+    return `${Math.abs(this.userLatitude).toFixed(4)}° ${latitudeDirection}, ${Math.abs(this.userLongitude).toFixed(4)}° ${longitudeDirection}`;
   }
-  private calculateBearingDegrees(
-    lat1: number,
-    lon1: number,
-    lat2: number,
-    lon2: number
-  ): number {
-    const φ1 = (lat1 * Math.PI) / 180;
-    const φ2 = (lat2 * Math.PI) / 180;
-    const Δλ = ((lon2 - lon1) * Math.PI) / 180;
 
-    const y = Math.sin(Δλ) * Math.cos(φ2);
-    const x =
-      Math.cos(φ1) * Math.sin(φ2) -
-      Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+  /**
+   * Get formatted distance string
+   */
+  getFormattedDistance(): string {
+    if (this.distanceToTarget === null) {
+      return 'Berechnung...';
+    }
+    return `${this.distanceToTarget} m`;
+  }
 
-    const θ = Math.atan2(y, x);
-    return ((θ * 180) / Math.PI + 360) % 360;
+  /**
+   * Get distance text color class
+   */
+  getDistanceColorClass(): string {
+    return this.isWithinTargetDistance ? 'greenline' : 'redline';
+  }
+
+  /**
+   * Manually retry location permission request
+   */
+  async retryLocationPermission() {
+    this.locationError = null;
+    await this.initializeLocationTracking();
+  }
+
+  /**
+   * Get current position once (not watching)
+   */
+  async getCurrentPosition() {
+    try {
+      const position = await Geolocation.getCurrentPosition({
+        enableHighAccuracy: true,
+        timeout: 10000
+      });
+
+      this.handleLocationUpdate(position);
+    } catch (error) {
+      console.error('Error getting current position:', error);
+      this.locationError = 'Fehler beim Abrufen der aktuellen Position.';
+    }
   }
 }

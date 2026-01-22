@@ -16,8 +16,6 @@ export class SensorTaskComponent implements OnDestroy {
   holdTime = 0;
   completed = false;
 
-  private intervalId: any;
-
   readonly HOLD_DURATION = 3;
 
   private motionListener?: PluginListenerHandle;
