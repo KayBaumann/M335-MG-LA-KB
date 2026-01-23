@@ -37,12 +37,7 @@ import { GameSession } from '../session/game-session.model';
   ]
 })
 
-export async function hapticSuccess() {
-  try {
-    await Haptics.notification({ type: NotificationType.Success });
-  } catch {
-  }
-}
+
 
 export class TaskRunnerPage implements OnInit, OnDestroy {
   private sub?: Subscription;
@@ -57,6 +52,11 @@ export class TaskRunnerPage implements OnInit, OnDestroy {
     private sessionService: GameSessionService
   ) { }
 
+  private async hapticSuccess() {
+    try {
+      await Haptics.notification({ type: NotificationType.Success });
+    } catch { }
+  }
   ngOnInit() {
     this.sub = this.sessionService.getSession().subscribe(s => {
       this.session = s;
@@ -132,7 +132,8 @@ export class TaskRunnerPage implements OnInit, OnDestroy {
 
   complete() {
     const res = this.sessionService.finishCurrentTask('completed');
-    hapticSuccess().then(() => {
+
+    this.hapticSuccess().finally(() => {
       if (res.done) this.finishRun();
     });
   }
