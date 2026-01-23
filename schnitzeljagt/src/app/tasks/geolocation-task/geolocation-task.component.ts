@@ -17,30 +17,23 @@ import * as L from 'leaflet';
 export class GeolocationTaskComponent extends BaseTask implements OnInit, OnDestroy {
   private ngZone = inject(NgZone);
   private cdr = inject(ChangeDetectorRef);
-  // Target destination (McDonald's in Lucerne)
   readonly TARGET_LATITUDE = 47.027455400650055;
   readonly TARGET_LONGITUDE = 8.301320050820248;
-  readonly TARGET_DISTANCE_THRESHOLD = 10; // meters
+  readonly TARGET_DISTANCE_THRESHOLD = 10;
 
-  // User's current position
   userLatitude: number | null = null;
   userLongitude: number | null = null;
 
-  // Distance to target in meters
   distanceToTarget: number | null = null;
 
-  // Geolocation tracking identifier
   geolocationWatchId: string | null = null;
 
-  // Timer display
   timeRemaining = '5:00';
 
-  // Location tracking status
   isTrackingLocation = false;
   locationError: string | null = null;
   permissionStatus: string = 'checking';
 
-  // Target reached status
   isWithinTargetDistance = false;
 
   constructor() { super(); }
@@ -80,12 +73,8 @@ export class GeolocationTaskComponent extends BaseTask implements OnInit, OnDest
 
 
 
-  /**
-   * Initialize location tracking with permission check
-   */
   async initializeLocationTracking() {
     try {
-      // Check current permission status
       const permissionStatus = await Geolocation.checkPermissions();
       console.log('Permission status:', permissionStatus);
 
@@ -93,7 +82,6 @@ export class GeolocationTaskComponent extends BaseTask implements OnInit, OnDest
         this.permissionStatus = 'granted';
         await this.startLocationTracking();
       } else if (permissionStatus.location === 'prompt' || permissionStatus.location === 'prompt-with-rationale') {
-        // Request permission
         const requestResult = await Geolocation.requestPermissions();
         console.log('Permission request result:', requestResult);
 
@@ -114,9 +102,7 @@ export class GeolocationTaskComponent extends BaseTask implements OnInit, OnDest
     }
   }
 
-  /**
-   * Start tracking user's location in real-time
-   */
+
   async startLocationTracking() {
     try {
       this.isTrackingLocation = true;
@@ -128,7 +114,6 @@ export class GeolocationTaskComponent extends BaseTask implements OnInit, OnDest
         maximumAge: 0
       };
 
-      // Watch position changes
       this.geolocationWatchId = await Geolocation.watchPosition(
         options,
         (position, error) => {
@@ -148,9 +133,6 @@ export class GeolocationTaskComponent extends BaseTask implements OnInit, OnDest
     }
   }
 
-  /**
-   * Stop tracking user's location
-   */
   async stopLocationTracking() {
     if (this.geolocationWatchId !== null) {
       try {
@@ -164,26 +146,12 @@ export class GeolocationTaskComponent extends BaseTask implements OnInit, OnDest
     }
   }
 
-  /**
-   * Handle successful location update
-   */
-  /**
-   * Handle successful location update
-   * Wrapped in NgZone to ensure automatic change detection
-   */  /**
-* Handle location tracking errors
-*/
-  /**
-   * Handle successful location update
-   * Wrapped in NgZone to ensure automatic change detection
-   */
   private handleLocationUpdate(position: Position | null) {
     if (!position || !position.coords) {
       console.warn('Invalid position data received');
       return;
     }
 
-    // Run inside Angular zone to trigger automatic change detection
     this.ngZone.run(() => {
       this.userLatitude = position.coords.latitude;
       this.userLongitude = position.coords.longitude;
@@ -205,7 +173,6 @@ export class GeolocationTaskComponent extends BaseTask implements OnInit, OnDest
 
       this.map.setView(userLatLng, 16);
 
-      // Always recalculate distance when position updates
       this.calculateDistanceToTarget();
 
       console.log('Location updated:', {
@@ -221,14 +188,10 @@ export class GeolocationTaskComponent extends BaseTask implements OnInit, OnDest
         this.finish();
       }
 
-      // Force change detection to ensure UI updates
       this.cdr.detectChanges();
     });
   }
 
-  /**
- * Handle location tracking errors
- */
   private handleLocationError(error: any) {
     this.ngZone.run(() => {
       this.isTrackingLocation = false;
@@ -243,12 +206,7 @@ export class GeolocationTaskComponent extends BaseTask implements OnInit, OnDest
       this.cdr.detectChanges();
     });
   }
-  /**
-   * Calculate distance from user to target using Haversine formula
-   */
-  /**
-   * Calculate distance from user to target using Haversine formula
-   */
+
   calculateDistanceToTarget() {
     if (this.userLatitude === null || this.userLongitude === null) {
       console.warn('Cannot calculate distance: coordinates not available');
@@ -273,11 +231,9 @@ export class GeolocationTaskComponent extends BaseTask implements OnInit, OnDest
 
     this.distanceToTarget = Math.round(EARTH_RADIUS_METERS * haversineC);
 
-    // Check if user is within target distance
     const previousStatus = this.isWithinTargetDistance;
     this.isWithinTargetDistance = this.distanceToTarget <= this.TARGET_DISTANCE_THRESHOLD;
 
-    // Log when status changes
     if (previousStatus !== this.isWithinTargetDistance) {
       console.log(`Distance status changed: ${this.isWithinTargetDistance ? 'WITHIN' : 'OUTSIDE'} target range`);
     }
@@ -287,9 +243,6 @@ export class GeolocationTaskComponent extends BaseTask implements OnInit, OnDest
     return degrees * Math.PI / 180;
   }
 
-  /**
-   * Format coordinates for display
-   */
   getFormattedCoordinates(): string {
     if (this.userLatitude === null || this.userLongitude === null) {
       return 'Warte auf Standort...';
@@ -301,9 +254,6 @@ export class GeolocationTaskComponent extends BaseTask implements OnInit, OnDest
     return `${Math.abs(this.userLatitude).toFixed(4)}° ${latitudeDirection}, ${Math.abs(this.userLongitude).toFixed(4)}° ${longitudeDirection}`;
   }
 
-  /**
-   * Get formatted distance string
-   */
   getFormattedDistance(): string {
     if (this.distanceToTarget === null) {
       return 'Berechnung...';
@@ -311,24 +261,15 @@ export class GeolocationTaskComponent extends BaseTask implements OnInit, OnDest
     return `${this.distanceToTarget} m`;
   }
 
-  /**
-   * Get distance text color class
-   */
   getDistanceColorClass(): string {
     return this.isWithinTargetDistance ? 'greenline' : 'redline';
   }
 
-  /**
-   * Manually retry location permission request
-   */
   async retryLocationPermission() {
     this.locationError = null;
     await this.initializeLocationTracking();
   }
 
-  /**
-   * Get current position once (not watching)
-   */
   async getCurrentPosition() {
     try {
       const position = await Geolocation.getCurrentPosition({
