@@ -139,8 +139,8 @@ export class GameSessionService {
 }
 
 function createSessionId(): string {
-  const c = globalThis.crypto as any;
-  if (c?.randomUUID) return c.randomUUID();
+    const c = globalThis.crypto as any;
+    if (c?.randomUUID) return c.randomUUID();
 
-  return Math.random().toString(16).slice(2) + Date.now().toString(16);
+    return Math.random().toString(16).slice(2) + Date.now().toString(16);
 }

@@ -2,8 +2,12 @@ import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonIcon } from '@ionic/angular/standalone';
 import { BaseTask } from '../base-task/base-task';
+import {
+  CapacitorBarcodeScanner,
+  CapacitorBarcodeScannerTypeHintALLOption
+} from '@capacitor/barcode-scanner';
 
-const TARGET_QR_CONTENT = 'SCHNITZELJAGD_2026_M335';
+const TARGET_QR_CONTENT = 'djsdgzoezkhdkdgvkiwehtiugfi';
 
 @Component({
   selector: 'app-qr-task',
@@ -12,41 +16,55 @@ const TARGET_QR_CONTENT = 'SCHNITZELJAGD_2026_M335';
   templateUrl: './qr-task.component.html',
 })
 export class QrTaskComponent extends BaseTask implements OnDestroy {
-
   scanning = false;
-  scannedContent: string | null = null;
+  scannedContent: string | null = null; 
   completed = false;
 
-  private timeoutId: any;
+  lastResult: string | null = null;
+  errorMessage: string | null = null;
+
   private finishTimeoutId: any;
 
   constructor() {
     super();
   }
 
-  simulateScan() {
+  async scanQR() {
     if (this.scanning || this.completed) return;
 
     this.scanning = true;
+    this.errorMessage = null;
     this.scannedContent = null;
 
-    this.timeoutId = setTimeout(() => {
-      const isCorrect = Math.random() > 0.3;
-      this.scannedContent = isCorrect
-        ? TARGET_QR_CONTENT
-        : 'WRONG_QR_CODE';
+    try {
+      const result = await CapacitorBarcodeScanner.scanBarcode({
+        hint: CapacitorBarcodeScannerTypeHintALLOption.ALL
+      });
 
-      this.scanning = false;
+      const content = result?.ScanResult ?? null;
 
-      if(isCorrect) {
-        this.finishTimeoutId = setTimeout(() => {
-          if (this.completed) return;
-
-          this.completed = true;
-          this.finish();
-        }, 1200);
+      if (!content) {
+        this.errorMessage = 'Kein QR Code erkannt. Bitte erneut scannen.';
+        return;
       }
-    }, 2000);
+
+      this.lastResult = content;
+      this.scannedContent = content;
+
+      if (content === TARGET_QR_CONTENT) {
+        this.completed = true;
+
+        this.finishTimeoutId = setTimeout(() => {
+          this.finish();
+        }, 800);
+      } else {
+        this.errorMessage = 'Falscher QR Code. Bitte scanne den richtigen Code.';
+      }
+    } catch (e) {
+      this.errorMessage = 'Scan abgebrochen oder Kamera nicht verfügbar.';
+    } finally {
+      this.scanning = false;
+    }
   }
 
   get isCorrect() {
@@ -54,7 +72,6 @@ export class QrTaskComponent extends BaseTask implements OnDestroy {
   }
 
   ngOnDestroy() {
-    clearTimeout(this.timeoutId);
     clearTimeout(this.finishTimeoutId);
   }
 }

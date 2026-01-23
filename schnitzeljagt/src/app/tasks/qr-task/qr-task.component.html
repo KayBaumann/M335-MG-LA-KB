@@ -73,9 +73,21 @@
 
     </div>
   </div>
+  <div *ngIf="errorMessage && !scannedContent" class="rounded-xl p-4 border bg-red-500/10 border-red-500/20">
+    <div class="flex items-center gap-3">
+      <div class="flex h-5 w-5 items-center justify-center rounded-full bg-red-400/20">
+        <span class="text-sm text-red-400">✕</span>
+      </div>
+      <div>
+        <p class="text-sm font-medium text-red-400">Hinweis</p>
+        <p class="mt-0.5 text-xs text-red-400/70">{{ errorMessage }}</p>
+      </div>
+    </div>
+  </div>
+
 
   <!-- Simulate Button -->
-  <button (click)="simulateScan()" class="h-12 w-full rounded-xl bg-blue-500
+  <button (click)="scanQR()" class="h-12 w-full rounded-xl bg-blue-500
            text-sm font-medium text-white
            transition hover:bg-blue-600 disabled:opacity-50" [disabled]="scanning || completed">
     {{ scanning ? 'Scanne…' : 'QR-Code scannen' }}
