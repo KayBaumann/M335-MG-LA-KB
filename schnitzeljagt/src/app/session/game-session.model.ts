@@ -8,8 +8,8 @@ export interface TaskResult {
     title: string;
     status: TaskStatus;
 
-    startedAt?: number;   // epoch ms
-    finishedAt?: number;  // epoch ms
+    startedAt?: number; 
+    finishedAt?: number; 
     durationSec?: number;
 
     schnitzelEarned: number;
