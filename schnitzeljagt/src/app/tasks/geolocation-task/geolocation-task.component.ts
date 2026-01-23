@@ -191,7 +191,7 @@ export class GeolocationTaskComponent extends BaseTask implements OnInit, OnDest
 
       if (!this.map) {
         this.initMap();
-      } 
+      }
       const userLatLng: L.LatLngExpression = [
         this.userLatitude!,
         this.userLongitude!
@@ -217,7 +217,8 @@ export class GeolocationTaskComponent extends BaseTask implements OnInit, OnDest
       });
 
       if (this.isWithinTargetDistance) {
-        console.log('🎯 Target reached! Within threshold distance.');
+        this.stopLocationTracking();
+        this.finish();
       }
 
       // Force change detection to ensure UI updates

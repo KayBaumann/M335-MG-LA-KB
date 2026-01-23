@@ -16,7 +16,7 @@ export const routes: Routes = [
   },
   {
     path: 'result-screen',
-    loadComponent: () => import('./result-screen/result-screen.page').then( m => m.ResultsPage)
+    loadComponent: () => import('./result-screen/result-screen.page').then( m => m.ResultScreenPage)
   },
 
 ];

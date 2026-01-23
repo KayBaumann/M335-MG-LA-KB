@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { IonButton, IonIcon, IonSpinner } from '@ionic/angular/standalone';
 import { Device } from '@capacitor/device';
 import { PluginListenerHandle } from '@capacitor/core';
+import { BaseTask } from '../base-task/base-task';
 
 
 @Component({
@@ -12,7 +13,7 @@ import { PluginListenerHandle } from '@capacitor/core';
   templateUrl: './power-task.component.html',
   styleUrls: ['./power-task.component.scss'],
 })
-export class PowerTaskComponent {
+export class PowerTaskComponent extends BaseTask implements OnInit, OnDestroy {
 
   private batteryInterval?: any;
 
@@ -21,6 +22,10 @@ export class PowerTaskComponent {
   completed = false;
   checking = false;
   initialLoading = true;
+
+  constructor() {
+    super();
+  }
 
 
   async checkPowerStatus() {
@@ -34,8 +39,10 @@ export class PowerTaskComponent {
         ? Math.round(battery.batteryLevel * 100)
         : 0;
 
-      if (this.isCharging) {
+      if (this.isCharging && !this.completed) {
         this.completed = true;
+        this.stopPolling();
+        this.finish(); // Event an Runner → complete()
       }
     } finally {
       this.checking = false;
@@ -51,8 +58,10 @@ export class PowerTaskComponent {
         ? Math.round(battery.batteryLevel * 100)
         : 0;
 
-      if (this.isCharging) {
+      if (this.isCharging && !this.completed) {
         this.completed = true;
+        this.stopPolling();
+        this.finish();
       }
     } finally {
       this.initialLoading = false;
@@ -72,6 +81,13 @@ export class PowerTaskComponent {
   }
 
   ngOnDestroy() {
-    clearInterval(this.batteryInterval);
+    this.stopPolling();
+  }
+
+  private stopPolling() {
+    if (this.batteryInterval) {
+      clearInterval(this.batteryInterval);
+      this.batteryInterval = undefined;
+    }
   }
 }

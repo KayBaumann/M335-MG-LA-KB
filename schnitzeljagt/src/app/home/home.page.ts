@@ -8,17 +8,20 @@ import { Geolocation } from '@capacitor/geolocation';
 import { Camera } from '@capacitor/camera';
 import { Platform } from '@ionic/angular';
 
+import { GameSessionService } from '../session/game-session.service';
+
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
-  imports: [IonContent , IonIcon, CommonModule, FormsModule, IonIcon],
+  imports: [IonContent, IonIcon, CommonModule, FormsModule, IonIcon],
 })
 export class HomePage {
   constructor(
-    
-    private router: Router
-  ) {}
+
+    private router: Router,
+    private session: GameSessionService,
+  ) { }
 
   showPermissions = false;
 
@@ -29,24 +32,27 @@ export class HomePage {
 
 
 
-  startGame(){
-    this.router.navigate(['/tasks']);
-  }
+  startGame() {
+    if (!this.name.trim()) return;
+    if (!this.locationPermission || !this.cameraPermission) return;
 
-  startClick(){
+    this.session.startNewSession(this.name);
+    this.router.navigate(['/tasks'], { replaceUrl: true });
+  }
+  startClick() {
     if (!this.name.trim()) return;
     this.showPermissions = true;
   }
 
-  viewHistory(){
+  viewHistory() {
     console.log("View History clicked");
   }
 
-  viewLeaderboard(){
+  viewLeaderboard() {
     console.log("View Leaderboard clicked");
   }
 
-  requestPermissions(){
+  requestPermissions() {
     this.locationPermission = true;
     this.cameraPermission = true;
   }

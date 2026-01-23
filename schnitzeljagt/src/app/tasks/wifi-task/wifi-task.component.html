@@ -5,10 +5,7 @@
     <div class="wifi-card">
       <div class="center">
         <div class="icon-circle">
-          <ion-icon
-            name="wifi"
-            class="wifi-icon"
-            [class.connected]="isWifiConnected"
+          <ion-icon name="wifi" class="wifi-icon" [class.connected]="isWifiConnected"
             [class.disconnected]="!isWifiConnected">
           </ion-icon>
         </div>
@@ -22,16 +19,6 @@
     <!-- STATUS -->
     <div class="status-card">
       <div class="status-row">
-        <span class="label">WLAN Status</span>
-        <div class="status-right">
-          <span class="dot" [class.dot-on]="isWifiConnected"></span>
-          <span class="status-text" [class.status-on]="isWifiConnected">
-            {{ isWifiConnected ? 'Verbunden' : 'Getrennt' }}
-          </span>
-        </div>
-      </div>
-
-      <div class="status-row">
         <span class="label">Einmal verbunden</span>
         <span class="value">{{ wasConnected ? 'Ja' : 'Nein' }}</span>
       </div>
@@ -44,35 +31,26 @@
 
     <!-- CONTROLS -->
     <div class="controls">
-      <ion-button
-        expand="block"
-        class="primary-btn"
-        [disabled]="checking || completed"
-        (click)="checkWifiStatus()">
 
-        <ng-container *ngIf="!checking; else loading">
-          <ion-icon slot="start" name="wifi"></ion-icon>
-          Status prüfen
-        </ng-container>
+      <ion-button expand="block" class="primary-btn" [disabled]="completed" (click)="toggleWifi()">
 
-        <ng-template #loading>
-          <ion-spinner name="crescent" class="spinner"></ion-spinner>
-          Prüfe…
-        </ng-template>
+        <ion-icon slot="start" [name]="toggleIconName"></ion-icon>
+        {{ toggleButtonText }}
       </ion-button>
 
       <div class="done" *ngIf="completed">
         <ion-icon name="checkmark-circle" class="done-icon"></ion-icon>
         <span>Aufgabe abgeschlossen</span>
       </div>
+
     </div>
 
   </ng-container>
 
   <ng-template #loadingState>
     <div class="loading-screen">
-      <ion-spinner name="crescent" class="initial-spinner"></ion-spinner>
-      <p class="loading-text">WLAN-Status wird geprüft…</p>
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>WLAN-Status wird initialisiert…</p>
     </div>
   </ng-template>
 </div>

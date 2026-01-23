@@ -25,3 +25,6 @@ project(':capacitor-network').projectDir = new File('../node_modules/@capacitor/
 
 include ':capacitor-status-bar'
 project(':capacitor-status-bar').projectDir = new File('../node_modules/@capacitor/status-bar/android')
+
+include ':capgo-capacitor-intent-launcher'
+project(':capgo-capacitor-intent-launcher').projectDir = new File('../node_modules/@capgo/capacitor-intent-launcher/android')

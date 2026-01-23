@@ -1,6 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonIcon } from '@ionic/angular/standalone';
+import { BaseTask } from '../base-task/base-task';
 
 const TARGET_QR_CONTENT = 'SCHNITZELJAGD_2026_M335';
 
@@ -10,13 +11,18 @@ const TARGET_QR_CONTENT = 'SCHNITZELJAGD_2026_M335';
   imports: [CommonModule, IonIcon],
   templateUrl: './qr-task.component.html',
 })
-export class QrTaskComponent implements OnDestroy {
+export class QrTaskComponent extends BaseTask implements OnDestroy {
 
   scanning = false;
   scannedContent: string | null = null;
   completed = false;
 
   private timeoutId: any;
+  private finishTimeoutId: any;
+
+  constructor() {
+    super();
+  }
 
   simulateScan() {
     if (this.scanning || this.completed) return;
@@ -32,10 +38,12 @@ export class QrTaskComponent implements OnDestroy {
 
       this.scanning = false;
 
-      if (isCorrect) {
-        setTimeout(() => {
+      if(isCorrect) {
+        this.finishTimeoutId = setTimeout(() => {
+          if (this.completed) return;
+
           this.completed = true;
-          console.log('QR Task completed');
+          this.finish();
         }, 1200);
       }
     }, 2000);
@@ -47,5 +55,6 @@ export class QrTaskComponent implements OnDestroy {
 
   ngOnDestroy() {
     clearTimeout(this.timeoutId);
+    clearTimeout(this.finishTimeoutId);
   }
 }

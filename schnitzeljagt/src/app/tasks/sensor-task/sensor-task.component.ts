@@ -1,8 +1,9 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonIcon } from '@ionic/angular/standalone';
 import { Motion } from '@capacitor/motion';
 import { PluginListenerHandle } from '@capacitor/core';
+import { BaseTask } from '../base-task/base-task';
 
 @Component({
   selector: 'app-sensor-task',
@@ -10,7 +11,7 @@ import { PluginListenerHandle } from '@capacitor/core';
   styleUrls: ['./sensor-task.component.scss'],
   imports: [CommonModule, IonIcon],
 })
-export class SensorTaskComponent implements OnDestroy {
+export class SensorTaskComponent extends BaseTask implements OnDestroy, OnInit {
 
   isUpsideDown = false;
   holdTime = 0;
@@ -20,6 +21,10 @@ export class SensorTaskComponent implements OnDestroy {
 
   private motionListener?: PluginListenerHandle;
   private holdInterval?: any;
+
+  constructor() {
+    super();
+  }
 
   toggleOrientation() {
     if (this.completed) return;
@@ -43,7 +48,7 @@ export class SensorTaskComponent implements OnDestroy {
       );
 
       if (this.holdTime >= this.HOLD_DURATION) {
-        this.complete();
+        this.completeInternal();
       }
     }, 100);
   }
@@ -55,12 +60,18 @@ export class SensorTaskComponent implements OnDestroy {
   }
 
 
-  private complete() {
-    clearInterval(this.holdInterval);
-    this.holdInterval = undefined;
+  private async completeInternal() {
+    if (this.completed) return;
+
     this.completed = true;
 
-    console.log('Task completed');
+    clearInterval(this.holdInterval);
+    this.holdInterval = undefined;
+
+    await this.motionListener?.remove();
+    this.motionListener = undefined;
+
+    this.finish();
   }
 
   get progressPercent() {
@@ -69,6 +80,7 @@ export class SensorTaskComponent implements OnDestroy {
 
   ngOnDestroy() {
     this.motionListener?.remove();
+    this.motionListener = undefined;
     clearInterval(this.holdInterval);
   }
 
