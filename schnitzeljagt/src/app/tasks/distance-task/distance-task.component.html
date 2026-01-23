@@ -1,5 +1,5 @@
 <div class="task-wrapper">
-  <!-- Distance Card -->
+
   <div class="distance-card">
     <div class="icon-circle">
       <ion-icon name="footsteps-outline"></ion-icon>
@@ -15,7 +15,6 @@
     </p>
   </div>
 
-  <!-- Progress -->
   <div class="progress-card">
     <div class="progress-header">
       <span>Fortschritt</span>
@@ -23,29 +22,22 @@
     </div>
 
     <div class="progress-bar">
-      <div
-        class="progress-fill"
-        [style.width.%]="progress">
-      </div>
+      <div class="progress-fill" [style.width.%]="progress"></div>
     </div>
   </div>
 
-  <!-- Controls -->
+  <div *ngIf="locationError" class="rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-300">
+    {{ locationError }}
+  </div>
+
   <div class="controls">
-    <ion-button
-      expand="block"
-      color="primary"
-      *ngIf="!tracking && distance < TARGET_DISTANCE"
+    <ion-button expand="block" color="primary" *ngIf="!tracking && distance < TARGET_DISTANCE"
       (click)="startTracking()">
       <ion-icon slot="start" name="play"></ion-icon>
       {{ distance > 0 ? 'Fortsetzen' : 'Tracking starten' }}
     </ion-button>
 
-    <ion-button
-      expand="block"
-      color="medium"
-      *ngIf="tracking"
-      (click)="pauseTracking()">
+    <ion-button expand="block" color="medium" *ngIf="tracking" (click)="pauseTracking()">
       <ion-icon slot="start" name="pause"></ion-icon>
       Pause
     </ion-button>
