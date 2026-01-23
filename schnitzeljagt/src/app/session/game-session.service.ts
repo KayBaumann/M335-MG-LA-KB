@@ -11,7 +11,6 @@ export class GameSessionService {
 
   private readonly session$ = new BehaviorSubject<GameSession | null>(this.load());
 
-  /* -------------------- PUBLIC API -------------------- */
 
   getSession() {
     return this.session$.asObservable();
@@ -88,7 +87,7 @@ export class GameSessionService {
       s.finishedAt = finishedAt;
       this.recalcTotals(s);
 
-      this.saveToHistory(s);   // ✅ Verlauf speichern
+      this.saveToHistory(s); 
       this.set(s);
 
       return { done: true };
@@ -117,7 +116,6 @@ export class GameSessionService {
     this.set(s);
   }
 
-  /* -------------------- HISTORY -------------------- */
 
   getHistory(): GameSession[] {
     const raw = localStorage.getItem(HISTORY_KEY);
@@ -136,7 +134,6 @@ export class GameSessionService {
     localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
   }
 
-  /* -------------------- INTERNAL -------------------- */
 
   private recalcTotals(s: GameSession) {
     s.totalSchnitzel = s.tasks.reduce((a, t) => a + (t.schnitzelEarned || 0), 0);
@@ -169,7 +166,6 @@ export class GameSessionService {
   }
 }
 
-/* -------------------- HELPERS -------------------- */
 
 function createSessionId(): string {
   const c = globalThis.crypto as any;

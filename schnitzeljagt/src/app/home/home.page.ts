@@ -70,7 +70,6 @@ export class HomePage {
     this.requestingLocation = true;
     try {
       await Geolocation.requestPermissions();
-      // kurzer Tick, damit OS den Status sicher persistiert
       await new Promise(r => setTimeout(r, 100));
       await this.refreshPermissions();
     } finally {
@@ -89,18 +88,15 @@ export class HomePage {
       const platform = Capacitor.getPlatform();
 
       if (platform === 'web') {
-        // Web: Permission wird erst durch echten Kamera Zugriff ausgelöst
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         stream.getTracks().forEach(t => t.stop());
       } else {
-        // Native: normaler Capacitor Weg
         await Camera.requestPermissions();
       }
 
       await new Promise(r => setTimeout(r, 100));
       await this.refreshPermissions();
     } catch {
-      // bleibt rot wenn user denied
       await this.refreshPermissions();
     } finally {
       this.zone.run(() => {
