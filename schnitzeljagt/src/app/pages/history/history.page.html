@@ -1,0 +1,63 @@
+<ion-content fullscreen
+  class="min-h-screen bg-gradient-to-br from-[#191919] via-[#1a1a1a] to-[#0d0d0d] text-white">
+
+  <div class="px-6 pt-12 pb-6 text-center">
+    <div
+      class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 mb-4">
+      <ion-icon name="time-outline" class="text-blue-400 text-[40px]"></ion-icon>
+    </div>
+
+    <h1 class="text-3xl font-medium mb-2">Spielverlauf</h1>
+    <p class="text-gray-400">Alle abgeschlossenen Schnitzeljagden</p>
+  </div>
+
+  <div class="px-6 pb-8 space-y-4" *ngIf="history.length; else empty">
+
+    <div *ngFor="let s of history"
+      class="bg-[#252525] rounded-2xl p-5 border border-white/5">
+
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <div class="font-medium text-lg">{{ s.name }}</div>
+          <div class="text-xs text-gray-400">
+            {{ s.startedAt | date:'dd.MM.yyyy HH:mm' }}
+          </div>
+        </div>
+
+        <div
+          class="px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-sm border border-blue-500/20">
+          {{ totalPoints(s) }} Pkt
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-3">
+        <div class="bg-[#1a1a1a] rounded-xl p-3 text-center border border-white/5">
+          <div class="text-lg">🍖</div>
+          <div class="font-medium">{{ s.totalSchnitzel }}</div>
+          <div class="text-xs text-gray-400">Schnitzel</div>
+        </div>
+
+        <div class="bg-[#1a1a1a] rounded-xl p-3 text-center border border-white/5">
+          <div class="text-lg">🥔</div>
+          <div class="font-medium">{{ s.totalPotatoes }}</div>
+          <div class="text-xs text-gray-400">Kartoffeln</div>
+        </div>
+
+        <div class="bg-[#1a1a1a] rounded-xl p-3 text-center border border-white/5">
+          <div class="text-lg">⏱️</div>
+          <div class="font-medium">{{ formatDuration(s.totalDurationSec) }}</div>
+          <div class="text-xs text-gray-400">Zeit</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <ng-template #empty>
+    <div class="flex flex-col items-center justify-center mt-24 text-gray-400">
+      <ion-icon name="archive-outline" class="text-5xl mb-4"></ion-icon>
+      <p>Noch keine Spiele vorhanden</p>
+    </div>
+  </ng-template>
+
+</ion-content>
