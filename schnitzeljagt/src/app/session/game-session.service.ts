@@ -136,6 +136,14 @@ export class GameSessionService {
         if (!s) throw new Error('No active session');
         return s;
     }
+
+    markSubmitted() {
+        const s = this.session$.value;
+        if (!s) return;
+
+        s.submittedAt = Date.now();
+        this.set(s);
+    }
 }
 
 function createSessionId(): string {
