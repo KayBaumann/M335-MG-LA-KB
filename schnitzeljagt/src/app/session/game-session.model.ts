@@ -22,6 +22,7 @@ export interface GameSession {
 
     startedAt: number;
     finishedAt?: number;
+    submittedAt?: number;
 
     currentTaskIndex: number;
 

@@ -19,6 +19,8 @@ export class ResultScreenPage implements OnInit {
   submitting = false;
   submitOk = false;
 
+  private submittedOnce = false;
+
   constructor(
     private sessionService: GameSessionService,
     private router: Router,
@@ -32,7 +34,21 @@ export class ResultScreenPage implements OnInit {
       this.router.navigate(['/home'], { replaceUrl: true });
       return;
     }
+    this.autoSubmitOnce();
   }
+
+  private async autoSubmitOnce() {
+    if (this.submittedOnce) return;
+    this.submittedOnce = true;
+
+    if (this.session?.submittedAt) {
+      this.submitOk = true;
+      return;
+    }
+
+    await this.submitToGoogleForm();
+  }
+
 
   get totalPoints(): number {
     if (!this.session) return 0;
@@ -84,6 +100,7 @@ export class ResultScreenPage implements OnInit {
 
       await firstValueFrom(this.http.post(url, body, { headers, responseType: 'text' }));
       this.submitOk = true;
+      this.sessionService.markSubmitted();
     } finally {
       this.submitting = false;
     }
