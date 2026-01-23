@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 
 import { GeolocationTaskComponent } from '../tasks/geolocation-task/geolocation-task.component';
 import { DistanceTaskComponent } from '../tasks/distance-task/distance-task.component';
@@ -35,6 +36,9 @@ import { GameSession } from '../session/game-session.model';
     WifiTaskComponent
   ]
 })
+
+
+
 export class TaskRunnerPage implements OnInit, OnDestroy {
   private sub?: Subscription;
   private tick?: any;
@@ -48,6 +52,11 @@ export class TaskRunnerPage implements OnInit, OnDestroy {
     private sessionService: GameSessionService
   ) { }
 
+  private async hapticSuccess() {
+    try {
+      await Haptics.notification({ type: NotificationType.Success });
+    } catch { }
+  }
   ngOnInit() {
     this.sub = this.sessionService.getSession().subscribe(s => {
       this.session = s;
@@ -123,7 +132,10 @@ export class TaskRunnerPage implements OnInit, OnDestroy {
 
   complete() {
     const res = this.sessionService.finishCurrentTask('completed');
-    if (res.done) this.finishRun();
+
+    this.hapticSuccess().finally(() => {
+      if (res.done) this.finishRun();
+    });
   }
 
   private finishRun() {
