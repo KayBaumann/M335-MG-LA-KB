@@ -17,6 +17,10 @@ export const routes: Routes = [
   {
     path: 'result-screen',
     loadComponent: () => import('./result-screen/result-screen.page').then( m => m.ResultScreenPage)
+  },  {
+    path: 'history',
+    loadComponent: () => import('./pages/history/history.page').then( m => m.HistoryPage)
   },
+
 
 ];

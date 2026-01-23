@@ -106,8 +106,8 @@ export class ResultScreenPage implements OnInit {
     }
   }
 
-  viewLeaderboard() {
-    this.router.navigate(['/leaderboard']);
+  goToHistory() {
+    this.router.navigate(['/history']);
   }
 
   playAgain() {

@@ -98,11 +98,12 @@
           <span>{{ submitOk ? 'Gesendet' : (submitting ? 'Sende…' : 'Ergebnis senden') }}</span>
         </button> -->
 
-        <button (click)="viewLeaderboard()"
-          class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-white/5 text-sm font-medium text-white transition hover:bg-white/10">
-          <ion-icon name="trophy-outline" class="text-lg"></ion-icon>
-          <span>Leaderboard</span>
-        </button>
+      <button (click)="goToHistory()"
+        class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-white/5 text-sm font-medium text-white transition hover:bg-white/10">
+        <ion-icon name="time-outline" class="text-lg"></ion-icon>
+        <span>Verlauf</span>
+      </button>
+
 
         <button (click)="playAgain()"
           class="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-white/5 text-sm font-medium text-white transition hover:bg-white/10">
