@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
+import { Haptics, NotificationType } from '@capacitor/haptics';
 
 import { GeolocationTaskComponent } from '../tasks/geolocation-task/geolocation-task.component';
 import { DistanceTaskComponent } from '../tasks/distance-task/distance-task.component';
@@ -36,34 +36,44 @@ import { GameSession } from '../session/game-session.model';
     WifiTaskComponent
   ]
 })
-
-
-
 export class TaskRunnerPage implements OnInit, OnDestroy {
   private sub?: Subscription;
   private tick?: any;
 
   session: GameSession | null = null;
-
   elapsed = 0;
+
+  canComplete = false;
 
   constructor(
     private router: Router,
     private sessionService: GameSessionService
-  ) { }
+  ) {}
+
+  onTaskCompletedChange(done: boolean) {
+    this.canComplete = !!done;
+  }
 
   private async hapticSuccess() {
     try {
       await Haptics.notification({ type: NotificationType.Success });
-    } catch { }
+    } catch {}
   }
+
   ngOnInit() {
     this.sub = this.sessionService.getSession().subscribe(s => {
+      const prevIndex = this.session?.currentTaskIndex;
       this.session = s;
+
       if (!s) {
         this.router.navigate(['/home'], { replaceUrl: true });
         return;
       }
+
+      if (prevIndex !== s.currentTaskIndex) {
+        this.canComplete = false;
+      }
+
       this.sessionService.startCurrentTaskIfNeeded();
       this.recalcElapsed();
     });
@@ -127,13 +137,17 @@ export class TaskRunnerPage implements OnInit, OnDestroy {
 
   skip() {
     const res = this.sessionService.finishCurrentTask('skipped');
+    this.canComplete = false;
     if (res.done) this.finishRun();
   }
 
   complete() {
+    if (!this.canComplete) return;
+
     const res = this.sessionService.finishCurrentTask('completed');
 
     this.hapticSuccess().finally(() => {
+      this.canComplete = false;
       if (res.done) this.finishRun();
     });
   }

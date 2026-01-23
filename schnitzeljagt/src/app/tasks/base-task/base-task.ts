@@ -2,9 +2,9 @@ import { EventEmitter, Output, Directive } from '@angular/core';
 
 @Directive()
 export abstract class BaseTask {
-    @Output() complete = new EventEmitter<void>();
+    @Output() completedChange = new EventEmitter<boolean>();
 
     protected finish() {
-        this.complete.emit();
+        this.completedChange.emit(true);
     }
 }

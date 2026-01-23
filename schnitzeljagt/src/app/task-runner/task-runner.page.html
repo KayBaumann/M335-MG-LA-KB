@@ -1,7 +1,6 @@
 <ion-content fullscreen class="min-h-screen bg-gradient-to-br from-[#191919] via-[#1a1a1a] to-[#0d0d0d]">
   <div class="flex min-h-screen flex-col text-white">
 
-    <!-- Header -->
     <div class="border-b border-white/5 bg-[#252525]/50 backdrop-blur-lg px-6 py-4">
       <div class="mb-3 flex items-center justify-between">
         <div class="flex items-center gap-2">
@@ -17,17 +16,13 @@
         </button>
       </div>
 
-      <!-- Progress Bar -->
       <div class="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
         <div class="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-500"
           [style.width.%]="progress"></div>
       </div>
     </div>
 
-    <!-- Task Content -->
     <div class="flex-1 overflow-y-auto px-6 py-6">
-
-      <!-- Task Header -->
       <div class="mb-6 rounded-2xl border border-white/5 bg-[#252525] p-6">
         <div class="flex items-start gap-4">
           <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400">
@@ -46,7 +41,6 @@
         </div>
       </div>
 
-      <!-- Timer -->
       <div class="mb-6 rounded-xl border border-white/5 bg-[#252525] p-4">
         <div class="flex items-center justify-between">
           <span class="text-sm text-gray-400">Zeit</span>
@@ -61,23 +55,16 @@
         </div>
       </div>
 
-      <!-- Task Component Switch -->
       <ng-container [ngSwitch]="task.type">
-        <app-geolocation-task *ngSwitchCase="'geolocation'" (complete)="complete()"></app-geolocation-task>
-
-        <app-qr-task *ngSwitchCase="'qr'" (complete)="complete()"></app-qr-task>
-
-        <app-distance-task *ngSwitchCase="'distance'" (complete)="complete()"></app-distance-task>
-
-        <app-sensor-task *ngSwitchCase="'sensor'" (complete)="complete()"></app-sensor-task>
-
-        <app-power-task *ngSwitchCase="'power'" (complete)="complete()"></app-power-task>
-
-        <app-wifi-task *ngSwitchCase="'wifi'" (complete)="complete()"></app-wifi-task>
+        <app-geolocation-task *ngSwitchCase="'geolocation'" (completedChange)="onTaskCompletedChange($event)"></app-geolocation-task>
+        <app-qr-task *ngSwitchCase="'qr'" (completedChange)="onTaskCompletedChange($event)"></app-qr-task>
+        <app-distance-task *ngSwitchCase="'distance'" (completedChange)="onTaskCompletedChange($event)"></app-distance-task>
+        <app-sensor-task *ngSwitchCase="'sensor'" (completedChange)="onTaskCompletedChange($event)"></app-sensor-task>
+        <app-power-task *ngSwitchCase="'power'" (completedChange)="onTaskCompletedChange($event)"></app-power-task>
+        <app-wifi-task *ngSwitchCase="'wifi'" (completedChange)="onTaskCompletedChange($event)"></app-wifi-task>
       </ng-container>
     </div>
 
-    <!-- Actions -->
     <div class="border-t border-white/5 bg-[#252525]/50 backdrop-blur-lg p-6">
       <div class="flex gap-3">
 
@@ -87,11 +74,14 @@
           <span>Überspringen</span>
         </button>
 
-        <button (click)="complete()"
-          class="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-green-500 font-medium transition hover:bg-green-600">
+        <button
+          (click)="complete()"
+          [disabled]="!canComplete"
+          class="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-green-500 font-medium transition hover:bg-green-600 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-green-500">
           <ion-icon name="checkmark-circle-outline"></ion-icon>
           <span>Abschließen</span>
         </button>
+
       </div>
     </div>
 
