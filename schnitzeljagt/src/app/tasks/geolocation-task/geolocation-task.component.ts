@@ -17,7 +17,7 @@ export class GeolocationTaskComponent extends BaseTask implements OnInit, OnDest
 
   readonly TARGET_LATITUDE = 47.027455400650055;
   readonly TARGET_LONGITUDE = 8.301320050820248;
-  readonly TARGET_DISTANCE_THRESHOLD = 10; // Meter
+  readonly TARGET_DISTANCE_THRESHOLD = 20; // Meter
 
   userLatitude: number | null = null;
   userLongitude: number | null = null;
